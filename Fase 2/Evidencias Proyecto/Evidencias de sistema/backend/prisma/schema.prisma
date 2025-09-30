@@ -1,0 +1,131 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo de Empresas
+model Company {
+  id        Int      @id @default(autoincrement())
+  nombre    String
+  rut       String   @unique
+  correo    String   @unique
+  telefono  String
+  direccion String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  
+  // Relaciones
+  jobs Job[]
+  
+  @@map("companies")
+}
+
+// Modelo de Reclutadores
+model Recruiter {
+  id             Int      @id @default(autoincrement())
+  nombreCompleto String   @map("nombre_completo")
+  correo         String   @unique
+  password       String
+  rol            String   @default("reclutador") // admin | reclutador
+  activo         Boolean  @default(true)
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+  
+  // Relaciones
+  jobs               Job[]
+  applicationEvents  ApplicationEvent[]
+  
+  @@map("recruiters")
+}
+
+// Modelo de Ofertas Laborales
+model Job {
+  id              Int       @id @default(autoincrement())
+  empresaId       Int       @map("empresa_id")
+  creadaPorId     Int       @map("creada_por_id")
+  slug            String    @unique
+  titulo          String
+  descripcion     String
+  ubicacion       String
+  modalidad       String    // presencial | híbrido | remoto
+  tipoContrato    String    @map("tipo_contrato") // indefinido | plazo fijo | honorarios
+  cantidadVacantes Int      @map("cantidad_vacantes")
+  rangoSalarial   String?   @map("rango_salarial")
+  estado          String    @default("borrador") // borrador | abierta | cerrada
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  
+  // Relaciones
+  empresa      Company       @relation(fields: [empresaId], references: [id])
+  creador      Recruiter     @relation(fields: [creadaPorId], references: [id])
+  applications Application[]
+  
+  @@map("jobs")
+}
+
+// Modelo de Candidatos
+model Candidate {
+  id              Int       @id @default(autoincrement())
+  nombreCompleto  String    @map("nombre_completo")
+  correo          String    @unique
+  telefono        String
+  nacionalidad    String
+  fechaNacimiento DateTime  @map("fecha_nacimiento")
+  linkedin        String?
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+  deletedAt       DateTime? @map("deleted_at")
+  
+  // Relaciones
+  applications Application[]
+  
+  @@map("candidates")
+}
+
+// Modelo de Postulaciones
+model Application {
+  id          Int       @id @default(autoincrement())
+  ofertaId    Int       @map("oferta_id")
+  candidatoId Int       @map("candidato_id")
+  cvUrl       String    @map("cv_url")
+  respuestas  Json?     // Para preguntas adicionales del formulario
+  etapa       String    @default("nueva") // nueva | preselección | entrevista | oferta | contratado | rechazado
+  fuente      String?   // portal | referido | linkedin | etc.
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at")
+  
+  // Relaciones
+  job       Job                @relation(fields: [ofertaId], references: [id])
+  candidate Candidate          @relation(fields: [candidatoId], references: [id])
+  events    ApplicationEvent[]
+  
+  // Índice único para evitar duplicados
+  @@unique([ofertaId, candidatoId])
+  @@map("applications")
+}
+
+// Modelo de Eventos de Postulación (Para tracking de cambios)
+model ApplicationEvent {
+  id            Int      @id @default(autoincrement())
+  postulacionId Int      @map("postulacion_id")
+  etapaAnterior String?  @map("etapa_anterior")
+  etapaNueva    String   @map("etapa_nueva")
+  cambiadoPorId Int      @map("cambiado_por_id")
+  nota          String?
+  fechaCambio   DateTime @default(now()) @map("fecha_cambio")
+  
+  // Relaciones
+  application Application @relation(fields: [postulacionId], references: [id])
+  recruiter   Recruiter   @relation(fields: [cambiadoPorId], references: [id])
+  
+  @@map("application_events")
+}
