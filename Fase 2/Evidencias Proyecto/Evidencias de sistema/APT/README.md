@@ -37,10 +37,10 @@ cd APT
 ## 🛠 Stack Tecnológico
 
 ### Frontend
-- **Next.js 14** + React + TypeScript
-- **TailwindCSS** para estilos
-- **Zustand** para gestión de estado
-- **Framer Motion** para animaciones
+- **Next.js 14** (App Router) + React + TypeScript
+- **TailwindCSS** + **Lucide Icons** para UI
+- Arquitectura modular: types, services, hooks, lib
+- Custom Hooks para gestión de estado
 - JWT para autenticación
 
 ### Backend
@@ -68,29 +68,44 @@ cd APT
 APT/
 ├── backend/                    # NestJS API
 │   ├── src/
+│   │   ├── modules/           # Módulos de dominio
+│   │   ├── auth/              # Autenticación JWT
+│   │   └── main.ts
 │   ├── prisma/
+│   │   ├── schema.prisma      # Definición de BD
+│   │   └── migrations/
 │   ├── Dockerfile
-│   ├── Dockerfile.dev         # ← NUEVO
-│   └── .dockerignore          # ← NUEVO
+│   ├── Dockerfile.dev
+│   └── .dockerignore
 │
 ├── frontend/                  # Next.js + React
 │   ├── src/
+│   │   ├── app/               # App Router (páginas)
+│   │   ├── components/        # Componentes reutilizables
+│   │   ├── types/             # Interfaces TypeScript centralizadas
+│   │   ├── services/          # Capa de API (HTTP client)
+│   │   ├── hooks/             # Custom hooks (lógica de negocio)
+│   │   └── lib/               # Utilidades (formatters, validators)
 │   ├── Dockerfile
-│   ├── Dockerfile.dev         # ← NUEVO
-│   ├── postcss.config.js      # ← NUEVO
-│   └── .dockerignore          # ← NUEVO
+│   ├── Dockerfile.dev
+│   ├── postcss.config.js
+│   └── .dockerignore
 │
 ├── ai/                        # Python FastAPI
 │   ├── api/
+│   │   ├── main.py            # FastAPI app
+│   │   ├── services/          # Servicios de IA
+│   │   └── models/            # Modelos ML
+│   ├── requirements.txt
 │   ├── Dockerfile
-│   └── .dockerignore          # ← NUEVO
+│   └── .dockerignore
 │
-├── n8n/                       # ← NUEVO
+├── n8n/                       # Automatización de workflows
 │   └── workflows/
-│       ├── evaluacion-cv.json
-│       └── recordatorio-entrevistas.json
+│       ├── evaluacion-cv.json           # Evaluación automática con IA
+│       └── recordatorio-entrevistas.json # Notificaciones
 │
-├── docs-mvp/                  # ← NUEVO (Documentación completa)
+├── docs-mvp/                  # Documentación completa del MVP
 │   ├── README.md              # Índice de documentación
 │   ├── INICIO-RAPIDO.md       # Guía de 5 minutos
 │   ├── GUIA-MVP-DOCKER.md     # Documentación completa
@@ -99,14 +114,11 @@ APT/
 │   ├── CHECKLIST-MVP.md       # Verificación paso a paso
 │   └── RESUMEN.md             # Resumen ejecutivo
 │
-├── docker-compose.yml         # Para DB local
-├── docker-compose.mvp.yml     # ← NUEVO (Completo con n8n)
+├── docker-compose.yml         # Base de datos local
+├── docker-compose.mvp.yml     # Stack completo (Backend, Frontend, AI, n8n, DB)
 │
-├── start-mvp.ps1              # ← NUEVO (Script de inicio)
-└── stop-mvp.ps1               # ← NUEVO (Script de detención)
-    ├── CASOS-USO-N8N.md
-    ├── CHECKLIST-MVP.md
-    └── RESUMEN.md
+├── start-mvp.ps1              # Script de inicio rápido
+└── stop-mvp.ps1               # Script de detención
 ```
 
 ## 🚀 Instalación
@@ -167,41 +179,156 @@ docker-compose up -d
 
 ## 🔧 Desarrollo
 
-### Backend (NestJS)
+### Opción 1: Con Docker (Recomendado) 🐳
+
+**Todo el stack en un comando:**
+```powershell
+.\start-mvp.ps1
+```
+
+Accede a:
+- Frontend: http://localhost:3001
+- Backend API: http://localhost:3000/api
+- AI Service: http://localhost:8000/docs
+- n8n: http://localhost:5678 (admin/admin123)
+
+### Opción 2: Desarrollo Local
+
+#### Backend (NestJS)
 ```bash
 cd backend
+npm install
 npm run start:dev
 ```
 API disponible en: `http://localhost:3000`
 
-### Frontend (Next.js)
+#### Frontend (Next.js)
 ```bash
 cd frontend
+npm install
 npm run dev
 ```
+
+**Estructura del frontend:**
+- `src/types/` - Interfaces TypeScript
+- `src/services/` - Llamadas a API
+- `src/hooks/` - Lógica de negocio
+- `src/lib/` - Utilidades
+- `src/components/` - Componentes UI
+- `src/app/` - Páginas (App Router)
+
 Aplicación disponible en: `http://localhost:3001`
 
-### AI Service (FastAPI)
+#### AI Service (FastAPI)
 ```bash
 cd ai
+pip install -r requirements.txt
+python -m spacy download es_core_news_sm
 uvicorn api.main:app --reload --port 8000
 ```
 API IA disponible en: `http://localhost:8000`
 
-### n8n (Automatización)
+#### n8n (Automatización)
 ```bash
-docker run -it --rm -p 5678:5678 -v ~/.n8n:/home/node/.n8n n8nio/n8n
+docker run -it --rm \
+  -p 5678:5678 \
+  -v ~/.n8n:/home/node/.n8n \
+  n8nio/n8n
 ```
 n8n disponible en: `http://localhost:5678`
 
 ## 📚 Documentación
 
+### Documentación MVP (Inicio Rápido)
+- **[INICIO-RAPIDO.md](docs-mvp/INICIO-RAPIDO.md)** - Guía de 5 minutos ⭐
+- [GUIA-MVP-DOCKER.md](docs-mvp/GUIA-MVP-DOCKER.md) - Documentación completa
+- [ARQUITECTURA-MVP.md](docs-mvp/ARQUITECTURA-MVP.md) - Diagramas del sistema
+- [CASOS-USO-N8N.md](docs-mvp/CASOS-USO-N8N.md) - Automatización con n8n
+- [CHECKLIST-MVP.md](docs-mvp/CHECKLIST-MVP.md) - Verificación paso a paso
+
+### Documentación Técnica Detallada
 - [Contexto de Negocio](docs/CONTEXTO_NEGOCIO.md)
 - [Stack Tecnológico](docs/TECH_STACK.md)
 - [Base de Datos](docs/BASE_DATOS.md)
 - [Backend NestJS](docs/BACKEND_NESTJS.md)
-- [Frontend](docs/FRONTEND.md)
+- [Frontend - Arquitectura](frontend/ARCHITECTURE.md) - Guía de arquitectura modular
 - [Estructura del Proyecto](docs/ESTRUCTURA_PROYECTO.md)
+
+## 🏛 Arquitectura del Sistema
+
+### Frontend - Arquitectura Modular
+
+El frontend sigue una arquitectura empresarial moderna con clara separación de responsabilidades:
+
+```
+frontend/src/
+├── types/          # 📦 Interfaces TypeScript centralizadas
+│   ├── candidato.types.ts
+│   ├── empresa.types.ts
+│   ├── vacante.types.ts
+│   ├── postulacion.types.ts
+│   ├── auth.types.ts
+│   ├── common.types.ts
+│   └── index.ts
+│
+├── services/       # 🌐 Capa de abstracción de API
+│   ├── api.service.ts       # HTTP client base con auth
+│   ├── auth.service.ts      # Autenticación
+│   ├── candidato.service.ts
+│   ├── empresa.service.ts
+│   ├── vacante.service.ts
+│   └── postulacion.service.ts
+│
+├── hooks/          # 🎣 Custom hooks (lógica de negocio)
+│   ├── useAuth.ts
+│   ├── useCandidatoPortal.ts
+│   └── useEmpresaDashboard.ts
+│
+├── lib/            # 🛠 Utilidades y helpers
+│   ├── formatters.ts    # Formateo de datos
+│   ├── validators.ts    # Validaciones
+│   └── constants.ts     # Constantes y enums
+│
+├── components/     # 🧩 Componentes reutilizables
+│   ├── VacanteCard.tsx
+│   ├── RankingTable.tsx
+│   └── FormularioPostulacion.tsx
+│
+└── app/            # 📄 Páginas (App Router)
+    ├── login/
+    ├── candidato/portal/
+    └── empresa/dashboard/
+```
+
+**Beneficios de esta arquitectura:**
+- ✅ **Single Source of Truth**: Tipos centralizados, sin duplicación
+- ✅ **Separación de Responsabilidades**: UI, lógica y datos separados
+- ✅ **Reutilización**: Hooks y servicios compartidos
+- ✅ **Testabilidad**: Servicios y hooks fácilmente mockeables
+- ✅ **Mantenibilidad**: Cambios localizados en un solo lugar
+- ✅ **Type Safety**: 100% de cobertura TypeScript
+
+📖 **Ver documentación completa:** [frontend/ARCHITECTURE.md](frontend/ARCHITECTURE.md)
+
+### Backend - API REST con NestJS
+
+- Arquitectura modular por dominio
+- Autenticación JWT con guards
+- Prisma ORM para gestión de BD
+- Swagger para documentación automática
+
+### IA Service - Procesamiento con Python
+
+- FastAPI para endpoints de análisis
+- Hugging Face Transformers para NLP
+- Análisis de texto y extracción de características
+- Scoring automatizado
+
+### n8n - Orquestación de Workflows
+
+- Evaluación automática al recibir postulación
+- Webhooks para comunicación entre servicios
+- Notificaciones y recordatorios
 
 ## 🔑 Características Principales
 
@@ -221,10 +348,11 @@ n8n disponible en: `http://localhost:5678`
 
 ### Inteligencia Artificial
 - ✅ Análisis automático de CVs
-- ✅ Evaluación de respuestas
-- ✅ Puntaje de compatibilidad
+- ✅ Evaluación de respuestas a preguntas
+- ✅ Puntaje de compatibilidad (0-100)
 - ✅ Feedback generado por IA
-- ✅ Ranking inteligente
+- ✅ Ranking inteligente de candidatos
+- ✅ Integración con n8n para procesamiento automático
 
 ## 🧪 Testing
 
