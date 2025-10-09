@@ -7,13 +7,10 @@ export type {
   Candidato,
   CandidatoDetalle,
   CandidatoRanking,
-} from './candidato.types';
+} from "./candidato.types";
 
 // Empresa
-export type {
-  Empresa,
-  EmpresaDetalle,
-} from './empresa.types';
+export type { Empresa, EmpresaDetalle } from "./empresa.types";
 
 // Vacante
 export type {
@@ -23,7 +20,7 @@ export type {
   CreateVacanteDTO,
   TipoContrato,
   Modalidad,
-} from './vacante.types';
+} from "./vacante.types";
 
 // Postulación
 export type {
@@ -33,7 +30,7 @@ export type {
   CreatePostulacionDTO,
   PostulacionFormData,
   EstadoPostulacion,
-} from './postulacion.types';
+} from "./postulacion.types";
 
 // Auth
 export type {
@@ -43,11 +40,7 @@ export type {
   RegisterCandidatoDTO,
   AuthUser,
   UserType,
-} from './auth.types';
+} from "./auth.types";
 
 // Common
-export type {
-  ApiResponse,
-  PaginatedResponse,
-  ApiError,
-} from './common.types';
+export type { ApiResponse, PaginatedResponse, ApiError } from "./common.types";

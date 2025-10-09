@@ -2,12 +2,12 @@
  * Hook de Autenticación
  */
 
-'use client';
+"use client";
 
-import { useRouter } from 'next/navigation';
-import { useState, useCallback } from 'react';
-import { authService } from '@/services/auth.service';
-import { LoginCredentials, UserType } from '@/types';
+import { useRouter } from "next/navigation";
+import { useState, useCallback } from "react";
+import { authService } from "@/services/auth.service";
+import { LoginCredentials, UserType } from "@/types";
 
 export function useAuth() {
   const router = useRouter();
@@ -17,49 +17,55 @@ export function useAuth() {
   /**
    * Login de empresa
    */
-  const loginEmpresa = useCallback(async (credentials: LoginCredentials) => {
-    setLoading(true);
-    setError(null);
+  const loginEmpresa = useCallback(
+    async (credentials: LoginCredentials) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await authService.loginEmpresa(credentials);
-      authService.saveAuth(response.access_token, 'empresa');
-      router.push('/empresa/dashboard');
-      return true;
-    } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [router]);
+      try {
+        const response = await authService.loginEmpresa(credentials);
+        authService.saveAuth(response.access_token, "empresa");
+        router.push("/empresa/dashboard");
+        return true;
+      } catch (err: any) {
+        setError(err.message || "Error al iniciar sesión");
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [router]
+  );
 
   /**
    * Login de candidato
    */
-  const loginCandidato = useCallback(async (credentials: LoginCredentials) => {
-    setLoading(true);
-    setError(null);
+  const loginCandidato = useCallback(
+    async (credentials: LoginCredentials) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await authService.loginCandidato(credentials);
-      authService.saveAuth(response.access_token, 'candidato');
-      router.push('/candidato/portal');
-      return true;
-    } catch (err: any) {
-      setError(err.message || 'Error al iniciar sesión');
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  }, [router]);
+      try {
+        const response = await authService.loginCandidato(credentials);
+        authService.saveAuth(response.access_token, "candidato");
+        router.push("/candidato/portal");
+        return true;
+      } catch (err: any) {
+        setError(err.message || "Error al iniciar sesión");
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [router]
+  );
 
   /**
    * Logout
    */
   const logout = useCallback(() => {
     authService.logout();
-    router.push('/login');
+    router.push("/login");
   }, [router]);
 
   /**

@@ -1,41 +1,39 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { 
-  User, 
-  Briefcase, 
-  FileText, 
-  LogOut, 
+import { useState } from "react";
+import {
+  User,
+  Briefcase,
+  FileText,
+  LogOut,
   Search,
   MapPin,
   Clock,
   DollarSign,
-  TrendingUp
-} from 'lucide-react';
+  TrendingUp,
+} from "lucide-react";
 
 // Importar tipos centralizados
-import { Vacante } from '@/types';
+import { Vacante } from "@/types";
 
 // Importar hook personalizado
-import { useCandidatoPortal } from '@/hooks/useCandidatoPortal';
+import { useCandidatoPortal } from "@/hooks/useCandidatoPortal";
 
 // Importar utilidades
-import { formatDate, getEstadoColor, formatCurrency } from '@/lib/formatters';
+import { formatDate, getEstadoColor, formatCurrency } from "@/lib/formatters";
 
 export default function PortalCandidatoPage() {
   // Usar hook personalizado para toda la lógica
-  const { 
-    candidato, 
-    vacantes, 
-    postulaciones, 
-    loading, 
-    logout 
-  } = useCandidatoPortal();
+  const { candidato, vacantes, postulaciones, loading, logout } =
+    useCandidatoPortal();
 
   // Estados locales de UI
-  const [activeTab, setActiveTab] = useState<'vacantes' | 'postulaciones' | 'perfil'>('vacantes');
+  const [activeTab, setActiveTab] = useState<
+    "vacantes" | "postulaciones" | "perfil"
+  >("vacantes");
   const [showModal, setShowModal] = useState(false);
-  const [vacanteSeleccionada, setVacanteSeleccionada] = useState<Vacante | null>(null);
+  const [vacanteSeleccionada, setVacanteSeleccionada] =
+    useState<Vacante | null>(null);
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -61,41 +59,46 @@ export default function PortalCandidatoPage() {
     // Validar que todas las preguntas estén respondidas
     const preguntas = vacanteSeleccionada.preguntasJson?.preguntas || [];
     if (preguntas.length > 0) {
-      const todasRespondidas = preguntas.every(
-        (_: any, index: number) => respuestas[`pregunta_${index + 1}`]?.trim()
+      const todasRespondidas = preguntas.every((_: any, index: number) =>
+        respuestas[`pregunta_${index + 1}`]?.trim()
       );
       if (!todasRespondidas) {
-        alert('Por favor responde todas las preguntas antes de enviar');
+        alert("Por favor responde todas las preguntas antes de enviar");
         return;
       }
     }
 
     setSubmitting(true);
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/postulaciones`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          idVacante: vacanteSeleccionada.id,
-          respuestasJson: respuestas,
-        }),
-      });
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/postulaciones`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            idVacante: vacanteSeleccionada.id,
+            respuestasJson: respuestas,
+          }),
+        }
+      );
 
       if (response.ok) {
-        alert('¡Postulación enviada exitosamente! El análisis con IA se está procesando.');
+        alert(
+          "¡Postulación enviada exitosamente! El análisis con IA se está procesando."
+        );
         handleCerrarModal();
         window.location.reload(); // Recargar página para actualizar datos
       } else {
         const errorData = await response.json().catch(() => ({}));
-        alert(errorData.message || 'Error al enviar la postulación');
+        alert(errorData.message || "Error al enviar la postulación");
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al enviar la postulación');
+      console.error("Error:", error);
+      alert("Error al enviar la postulación");
     } finally {
       setSubmitting(false);
     }
@@ -123,7 +126,9 @@ export default function PortalCandidatoPage() {
                 <Briefcase className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-800">Portal de Candidato</h1>
+                <h1 className="text-xl font-bold text-gray-800">
+                  Portal de Candidato
+                </h1>
                 <p className="text-sm text-gray-600">{candidato?.nombre}</p>
               </div>
             </div>
@@ -143,11 +148,11 @@ export default function PortalCandidatoPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex gap-8">
             <button
-              onClick={() => setActiveTab('vacantes')}
+              onClick={() => setActiveTab("vacantes")}
               className={`py-4 px-2 border-b-2 font-medium transition-all ${
-                activeTab === 'vacantes'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-800'
+                activeTab === "vacantes"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-800"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -156,11 +161,11 @@ export default function PortalCandidatoPage() {
               </div>
             </button>
             <button
-              onClick={() => setActiveTab('postulaciones')}
+              onClick={() => setActiveTab("postulaciones")}
               className={`py-4 px-2 border-b-2 font-medium transition-all ${
-                activeTab === 'postulaciones'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-800'
+                activeTab === "postulaciones"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-800"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -169,11 +174,11 @@ export default function PortalCandidatoPage() {
               </div>
             </button>
             <button
-              onClick={() => setActiveTab('perfil')}
+              onClick={() => setActiveTab("perfil")}
               className={`py-4 px-2 border-b-2 font-medium transition-all ${
-                activeTab === 'perfil'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-800'
+                activeTab === "perfil"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-800"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -188,7 +193,7 @@ export default function PortalCandidatoPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Vacantes Tab */}
-        {activeTab === 'vacantes' && (
+        {activeTab === "vacantes" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-800">
@@ -207,7 +212,9 @@ export default function PortalCandidatoPage() {
                       <h3 className="text-xl font-bold text-gray-800 mb-2">
                         {vacante.titulo}
                       </h3>
-                      <p className="text-gray-600 font-medium">{vacante.empresa.nombre}</p>
+                      <p className="text-gray-600 font-medium">
+                        {vacante.empresa.nombre}
+                      </p>
                     </div>
                     {vacante.empresa.logoUrl && (
                       <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
@@ -264,7 +271,7 @@ export default function PortalCandidatoPage() {
         )}
 
         {/* Postulaciones Tab */}
-        {activeTab === 'postulaciones' && (
+        {activeTab === "postulaciones" && (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-800">
               Mis Postulaciones ({postulaciones.length})
@@ -293,7 +300,9 @@ export default function PortalCandidatoPage() {
                           </span>
                         </div>
                         <div>
-                          <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getEstadoColor(postulacion.estado)}`}>
+                          <span
+                            className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getEstadoColor(postulacion.estado)}`}
+                          >
                             {postulacion.estado}
                           </span>
                         </div>
@@ -322,10 +331,11 @@ export default function PortalCandidatoPage() {
                     No tienes postulaciones aún
                   </h3>
                   <p className="text-gray-600 mb-4">
-                    Explora las vacantes disponibles y postula a las que te interesen
+                    Explora las vacantes disponibles y postula a las que te
+                    interesen
                   </p>
                   <button
-                    onClick={() => setActiveTab('vacantes')}
+                    onClick={() => setActiveTab("vacantes")}
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                   >
                     Ver Vacantes
@@ -337,7 +347,7 @@ export default function PortalCandidatoPage() {
         )}
 
         {/* Perfil Tab */}
-        {activeTab === 'perfil' && candidato && (
+        {activeTab === "perfil" && candidato && (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-800">Mi Perfil</h2>
 
@@ -362,7 +372,9 @@ export default function PortalCandidatoPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Teléfono
                     </label>
-                    <p className="text-lg text-gray-800">{candidato.telefono}</p>
+                    <p className="text-lg text-gray-800">
+                      {candidato.telefono}
+                    </p>
                   </div>
                 )}
 
@@ -371,7 +383,9 @@ export default function PortalCandidatoPage() {
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Años de Experiencia
                     </label>
-                    <p className="text-lg text-gray-800">{candidato.experienciaAnios} años</p>
+                    <p className="text-lg text-gray-800">
+                      {candidato.experienciaAnios} años
+                    </p>
                   </div>
                 )}
 
@@ -393,23 +407,33 @@ export default function PortalCandidatoPage() {
               </div>
 
               <div className="mt-6 pt-6 border-t">
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Estadísticas</h3>
+                <h3 className="text-lg font-bold text-gray-800 mb-4">
+                  Estadísticas
+                </h3>
                 <div className="grid grid-cols-3 gap-4">
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
                     <div className="text-3xl font-bold text-blue-600">
                       {postulaciones.length}
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">Postulaciones</div>
+                    <div className="text-sm text-gray-600 mt-1">
+                      Postulaciones
+                    </div>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
                     <div className="text-3xl font-bold text-green-600">
-                      {postulaciones.filter(p => p.estado === 'Aprobado').length}
+                      {
+                        postulaciones.filter((p) => p.estado === "Aprobado")
+                          .length
+                      }
                     </div>
                     <div className="text-sm text-gray-600 mt-1">Aprobadas</div>
                   </div>
                   <div className="text-center p-4 bg-yellow-50 rounded-lg">
                     <div className="text-3xl font-bold text-yellow-600">
-                      {postulaciones.filter(p => p.estado === 'Pendiente').length}
+                      {
+                        postulaciones.filter((p) => p.estado === "Pendiente")
+                          .length
+                      }
                     </div>
                     <div className="text-sm text-gray-600 mt-1">Pendientes</div>
                   </div>
@@ -443,7 +467,8 @@ export default function PortalCandidatoPage() {
                   {vacanteSeleccionada.empresa.nombre}
                 </h4>
                 <p className="text-sm text-blue-700">
-                  {vacanteSeleccionada.ubicacion} • {vacanteSeleccionada.tipoContrato}
+                  {vacanteSeleccionada.ubicacion} •{" "}
+                  {vacanteSeleccionada.tipoContrato}
                 </p>
               </div>
 
@@ -454,34 +479,40 @@ export default function PortalCandidatoPage() {
                       Responde las siguientes preguntas:
                     </h4>
                     <p className="text-sm text-gray-600 mb-4">
-                      Estas respuestas serán analizadas por IA para evaluar tu compatibilidad con la vacante.
+                      Estas respuestas serán analizadas por IA para evaluar tu
+                      compatibilidad con la vacante.
                     </p>
                   </div>
 
-                  {vacanteSeleccionada.preguntasJson.preguntas.map((pregunta: any, index: number) => (
-                    <div key={index} className="space-y-2">
-                      <label className="block text-sm font-medium text-gray-700">
-                        {index + 1}. {pregunta.pregunta || pregunta}
-                        <span className="text-red-500">*</span>
-                      </label>
-                      <textarea
-                        value={respuestas[`pregunta_${index + 1}`] || ''}
-                        onChange={(e) => setRespuestas({
-                          ...respuestas,
-                          [`pregunta_${index + 1}`]: e.target.value
-                        })}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        rows={4}
-                        placeholder="Escribe tu respuesta aquí..."
-                        disabled={submitting}
-                      />
-                    </div>
-                  ))}
+                  {vacanteSeleccionada.preguntasJson.preguntas.map(
+                    (pregunta: any, index: number) => (
+                      <div key={index} className="space-y-2">
+                        <label className="block text-sm font-medium text-gray-700">
+                          {index + 1}. {pregunta.pregunta || pregunta}
+                          <span className="text-red-500">*</span>
+                        </label>
+                        <textarea
+                          value={respuestas[`pregunta_${index + 1}`] || ""}
+                          onChange={(e) =>
+                            setRespuestas({
+                              ...respuestas,
+                              [`pregunta_${index + 1}`]: e.target.value,
+                            })
+                          }
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          rows={4}
+                          placeholder="Escribe tu respuesta aquí..."
+                          disabled={submitting}
+                        />
+                      </div>
+                    )
+                  )}
                 </>
               ) : (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
                   <p className="text-gray-600">
-                    Esta vacante no tiene preguntas específicas. Puedes postular directamente.
+                    Esta vacante no tiene preguntas específicas. Puedes postular
+                    directamente.
                   </p>
                 </div>
               )}
@@ -500,7 +531,7 @@ export default function PortalCandidatoPage() {
                 className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={submitting}
               >
-                {submitting ? 'Enviando...' : 'Enviar Postulación'}
+                {submitting ? "Enviando..." : "Enviar Postulación"}
               </button>
             </div>
           </div>

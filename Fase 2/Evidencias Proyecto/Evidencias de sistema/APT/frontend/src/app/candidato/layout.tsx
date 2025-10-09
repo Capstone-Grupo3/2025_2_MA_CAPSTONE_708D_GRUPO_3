@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function CandidatoLayout({
   children,
@@ -11,11 +11,11 @@ export default function CandidatoLayout({
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userType = localStorage.getItem('userType');
+    const token = localStorage.getItem("token");
+    const userType = localStorage.getItem("userType");
 
-    if (!token || userType !== 'candidato') {
-      router.push('/login');
+    if (!token || userType !== "candidato") {
+      router.push("/login");
     }
   }, [router]);
 

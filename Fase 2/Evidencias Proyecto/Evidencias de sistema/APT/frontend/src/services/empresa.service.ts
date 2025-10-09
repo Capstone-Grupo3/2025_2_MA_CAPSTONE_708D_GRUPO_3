@@ -2,8 +2,8 @@
  * Servicio de Empresas
  */
 
-import { Empresa } from '@/types';
-import apiService from './api.service';
+import { Empresa } from "@/types";
+import apiService from "./api.service";
 
 class EmpresaService {
   /**
@@ -24,7 +24,7 @@ class EmpresaService {
    * Obtener todas las empresas
    */
   async getEmpresas(): Promise<Empresa[]> {
-    return apiService.get<Empresa[]>('/empresas');
+    return apiService.get<Empresa[]>("/empresas");
   }
 }
 

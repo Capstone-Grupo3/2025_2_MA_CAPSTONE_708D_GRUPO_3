@@ -4,11 +4,11 @@
 
 @layer base {
   * {
-    border-color: theme('colors.gray.200');
+    border-color: theme("colors.gray.200");
   }
 
   body {
     margin: 0;
-    font-family: theme('fontFamily.sans');
+    font-family: theme("fontFamily.sans");
   }
 }
