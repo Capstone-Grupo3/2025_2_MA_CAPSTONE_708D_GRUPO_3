@@ -1,0 +1,189 @@
+// ================================================================
+// SCHEMA PRISMA - APT (Advanced People Tracking)
+// ================================================================
+// Sistema de reclutamiento inteligente con análisis de CV por IA
+// Base de datos: PostgreSQL (Supabase)
+// ================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ================================================================
+// MODELO: EMPRESA
+// ================================================================
+// Empresas que publican vacantes y gestionan postulaciones
+// ================================================================
+
+model Empresa {
+  id             Int           @id @default(autoincrement())
+  nombre         String        @db.VarChar(150)
+  correo         String        @unique @db.VarChar(150)
+  contrasenaHash String        @db.VarChar(255)
+  descripcion    String?       @db.Text
+  logoUrl        String?       @db.VarChar(255)
+  fechaCreacion  DateTime      @default(now())
+  estado         EstadoEmpresa @default(ACTIVO)
+  
+  // Relaciones
+  vacantes Vacante[]
+
+  @@map("empresas")
+  @@index([correo])
+  @@index([estado])
+}
+
+// ================================================================
+// MODELO: CANDIDATO
+// ================================================================
+// Candidatos que postulan a vacantes
+// ================================================================
+
+model Candidato {
+  id               Int             @id @default(autoincrement())
+  nombre           String          @db.VarChar(150)
+  correo           String          @unique @db.VarChar(150)
+  contrasenaHash   String          @db.VarChar(255)
+  telefono         String?         @db.VarChar(20)
+  cvUrl            String?         @db.VarChar(500)
+  linkedinUrl      String?         @db.VarChar(255)
+  skillsJson       Json?
+  experienciaAnios Int?
+  fechaRegistro    DateTime        @default(now())
+  estado           EstadoCandidato @default(ACTIVO)
+  
+  // Relaciones
+  postulaciones Postulacion[]
+
+  @@map("candidatos")
+  @@index([correo])
+  @@index([estado])
+}
+
+// ================================================================
+// MODELO: VACANTE
+// ================================================================
+// Ofertas de trabajo publicadas por empresas
+// ================================================================
+
+model Vacante {
+  id               Int           @id @default(autoincrement())
+  idEmpresa        Int
+  titulo           String        @db.VarChar(200)
+  descripcion      String        @db.Text
+  tipoContrato     TipoContrato
+  ubicacion        String        @db.VarChar(150)
+  modalidad        Modalidad
+  salarioEstimado  Decimal?      @db.Decimal(12, 2)
+  preguntasJson    Json?
+  requisitos       String?       @db.Text
+  fechaPublicacion DateTime      @default(now())
+  fechaCierre      DateTime?
+  estado           EstadoVacante @default(ACTIVA)
+  
+  // Relaciones
+  empresa       Empresa       @relation(fields: [idEmpresa], references: [id], onDelete: Cascade)
+  postulaciones Postulacion[]
+
+  @@map("vacantes")
+  @@index([idEmpresa])
+  @@index([estado])
+  @@index([fechaPublicacion])
+}
+
+// ================================================================
+// MODELO: POSTULACION
+// ================================================================
+// Postulaciones de candidatos a vacantes con análisis IA
+// ================================================================
+
+model Postulacion {
+  id               Int               @id @default(autoincrement())
+  idCandidato      Int
+  idVacante        Int
+  respuestasJson   Json?
+  puntajeIa        Decimal?          @db.Decimal(5, 2)
+  feedbackIa       String?           @db.Text
+  estado           EstadoPostulacion @default(PENDIENTE)
+  fechaPostulacion DateTime          @default(now())
+  fechaActualizacion DateTime        @updatedAt
+  
+  // Relaciones
+  candidato     Candidato      @relation(fields: [idCandidato], references: [id], onDelete: Cascade)
+  vacante       Vacante        @relation(fields: [idVacante], references: [id], onDelete: Cascade)
+  evaluaciones  EvaluacionIA[]
+
+  @@unique([idCandidato, idVacante])
+  @@map("postulaciones")
+  @@index([idCandidato])
+  @@index([idVacante])
+  @@index([estado])
+  @@index([fechaPostulacion])
+}
+
+// ================================================================
+// MODELO: EVALUACION_IA
+// ================================================================
+// Registro de evaluaciones realizadas por IA (historial)
+// ================================================================
+
+model EvaluacionIA {
+  id              Int         @id @default(autoincrement())
+  idPostulacion   Int
+  modeloUsado     String      @db.VarChar(100)
+  resultadoJson   Json?
+  fechaEvaluacion DateTime    @default(now())
+  
+  // Relaciones
+  postulacion Postulacion @relation(fields: [idPostulacion], references: [id], onDelete: Cascade)
+
+  @@map("evaluaciones_ia")
+  @@index([idPostulacion])
+  @@index([fechaEvaluacion])
+}
+
+// ================================================================
+// ENUMS
+// ================================================================
+
+enum EstadoEmpresa {
+  ACTIVO
+  INACTIVO
+}
+
+enum EstadoCandidato {
+  ACTIVO
+  INACTIVO
+}
+
+enum TipoContrato {
+  FULL_TIME
+  PART_TIME
+  PRACTICA
+  FREELANCE
+}
+
+enum Modalidad {
+  PRESENCIAL
+  REMOTO
+  HIBRIDO
+}
+
+enum EstadoVacante {
+  ACTIVA
+  CERRADA
+  EN_PROCESO
+}
+
+enum EstadoPostulacion {
+  PENDIENTE
+  EN_REVISION
+  EVALUADO
+  RECHAZADO
+  SELECCIONADO
+}
