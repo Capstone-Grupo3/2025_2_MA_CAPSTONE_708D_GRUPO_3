@@ -1,26 +1,37 @@
-import { Trophy, Medal, Award, User } from 'lucide-react';
-import { CandidatoRanking } from '@/types';
-import { getPuntajeColor, formatDateShort } from '@/lib/formatters';
+import { Trophy, Medal, Award, User } from "lucide-react";
+import { CandidatoRanking } from "@/types";
+import { getPuntajeColor, formatDateShort } from "@/lib/formatters";
 
 interface RankingTableProps {
   candidatos: CandidatoRanking[];
   onSelectCandidato?: (candidato: CandidatoRanking) => void;
 }
 
-export default function RankingTable({ candidatos, onSelectCandidato }: RankingTableProps) {
+export default function RankingTable({
+  candidatos,
+  onSelectCandidato,
+}: RankingTableProps) {
   const getMedalIcon = (position: number) => {
     if (position === 1) return <Trophy className="w-6 h-6 text-yellow-500" />;
     if (position === 2) return <Medal className="w-6 h-6 text-gray-400" />;
     if (position === 3) return <Award className="w-6 h-6 text-orange-600" />;
-    return <span className="w-6 h-6 flex items-center justify-center text-gray-500 font-semibold">{position}</span>;
+    return (
+      <span className="w-6 h-6 flex items-center justify-center text-gray-500 font-semibold">
+        {position}
+      </span>
+    );
   };
 
   if (candidatos.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
         <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">No hay postulaciones aún</h3>
-        <p className="text-gray-500">Cuando los candidatos postulen, aparecerán aquí con su ranking de IA.</p>
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">
+          No hay postulaciones aún
+        </h3>
+        <p className="text-gray-500">
+          Cuando los candidatos postulen, aparecerán aquí con su ranking de IA.
+        </p>
       </div>
     );
   }
@@ -74,7 +85,9 @@ export default function RankingTable({ candidatos, onSelectCandidato }: RankingT
                 {/* Candidato */}
                 <td className="px-6 py-4">
                   <div>
-                    <p className="text-sm font-semibold text-gray-800">{candidato.nombre_completo}</p>
+                    <p className="text-sm font-semibold text-gray-800">
+                      {candidato.nombre_completo}
+                    </p>
                     <p className="text-xs text-gray-500">{candidato.email}</p>
                   </div>
                 </td>

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function EmpresaLayout({
   children,
@@ -11,11 +11,11 @@ export default function EmpresaLayout({
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userType = localStorage.getItem('userType');
+    const token = localStorage.getItem("token");
+    const userType = localStorage.getItem("userType");
 
-    if (!token || userType !== 'empresa') {
-      router.push('/login');
+    if (!token || userType !== "empresa") {
+      router.push("/login");
     }
   }, [router]);
 

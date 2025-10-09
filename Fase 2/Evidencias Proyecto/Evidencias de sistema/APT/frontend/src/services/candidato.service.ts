@@ -2,8 +2,8 @@
  * Servicio de Candidatos
  */
 
-import { Candidato } from '@/types';
-import apiService from './api.service';
+import { Candidato } from "@/types";
+import apiService from "./api.service";
 
 class CandidatoService {
   /**
@@ -16,7 +16,10 @@ class CandidatoService {
   /**
    * Actualizar perfil del candidato
    */
-  async updateCandidato(id: number, data: Partial<Candidato>): Promise<Candidato> {
+  async updateCandidato(
+    id: number,
+    data: Partial<Candidato>
+  ): Promise<Candidato> {
     return apiService.patch<Candidato>(`/candidatos/${id}`, data);
   }
 
@@ -24,7 +27,7 @@ class CandidatoService {
    * Obtener todos los candidatos (solo para empresas)
    */
   async getCandidatos(): Promise<Candidato[]> {
-    return apiService.get<Candidato[]>('/candidatos');
+    return apiService.get<Candidato[]>("/candidatos");
   }
 }
 

@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { 
+import { useState } from "react";
+import {
   Building2,
-  Briefcase, 
-  Users, 
-  LogOut, 
+  Briefcase,
+  Users,
+  LogOut,
   Plus,
   Edit,
   Trash2,
@@ -16,50 +16,52 @@ import {
   DollarSign,
   TrendingUp,
   Search,
-  Filter
-} from 'lucide-react';
+  Filter,
+} from "lucide-react";
 
 // Importar tipos centralizados
-import { PostulacionDetalle } from '@/types';
+import { PostulacionDetalle } from "@/types";
 
 // Importar hook personalizado
-import { useEmpresaDashboard } from '@/hooks/useEmpresaDashboard';
+import { useEmpresaDashboard } from "@/hooks/useEmpresaDashboard";
 
 // Importar utilidades
-import { 
-  formatDate, 
-  formatCurrency, 
+import {
+  formatDate,
+  formatCurrency,
   getEstadoColor,
-  getTipoContratoLabel 
-} from '@/lib/formatters';
+  getTipoContratoLabel,
+} from "@/lib/formatters";
 
 export default function DashboardEmpresaPage() {
   // Usar hook personalizado para toda la lógica de datos
-  const { 
-    empresa, 
-    vacantes, 
-    loading, 
+  const {
+    empresa,
+    vacantes,
+    loading,
     logout,
     deleteVacante,
-    toggleVacanteStatus
+    toggleVacanteStatus,
   } = useEmpresaDashboard();
 
   // Estados locales de UI
-  const [activeTab, setActiveTab] = useState<'vacantes' | 'postulaciones' | 'crear' | 'perfil'>('vacantes');
+  const [activeTab, setActiveTab] = useState<
+    "vacantes" | "postulaciones" | "crear" | "perfil"
+  >("vacantes");
   const [postulaciones, setPostulaciones] = useState<PostulacionDetalle[]>([]);
-  
+
   // Estado para crear vacante
   const [nuevaVacante, setNuevaVacante] = useState({
-    titulo: '',
-    descripcion: '',
-    ubicacion: '',
-    salario: '',
-    tipoContrato: 'FULL_TIME',
-    modalidad: 'PRESENCIAL',
-    requisitos: '',
-    pregunta1: '',
-    pregunta2: '',
-    pregunta3: '',
+    titulo: "",
+    descripcion: "",
+    ubicacion: "",
+    salario: "",
+    tipoContrato: "FULL_TIME",
+    modalidad: "PRESENCIAL",
+    requisitos: "",
+    pregunta1: "",
+    pregunta2: "",
+    pregunta3: "",
   });
 
   const handleLogout = () => {
@@ -67,10 +69,10 @@ export default function DashboardEmpresaPage() {
   };
 
   const handleDeleteVacante = async (vacanteId: number) => {
-    if (confirm('¿Estás seguro de eliminar esta vacante?')) {
+    if (confirm("¿Estás seguro de eliminar esta vacante?")) {
       const success = await deleteVacante(vacanteId);
       if (success) {
-        alert('Vacante eliminada correctamente');
+        alert("Vacante eliminada correctamente");
       }
     }
   };
@@ -78,110 +80,118 @@ export default function DashboardEmpresaPage() {
   const handleToggleVacante = async (vacanteId: number, activa: boolean) => {
     const success = await toggleVacanteStatus(vacanteId, !activa);
     if (success) {
-      alert(`Vacante ${!activa ? 'activada' : 'desactivada'} correctamente`);
+      alert(`Vacante ${!activa ? "activada" : "desactivada"} correctamente`);
     }
   };
 
   const fetchPostulacionesByVacante = async (vacanteId: number) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const headers = {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
       };
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/postulaciones/vacante/${vacanteId}`, {
-        headers,
-      });
-      
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/postulaciones/vacante/${vacanteId}`,
+        {
+          headers,
+        }
+      );
+
       if (response.ok) {
         const data = await response.json();
         setPostulaciones(data);
-        setActiveTab('postulaciones');
+        setActiveTab("postulaciones");
       }
     } catch (error) {
-      console.error('Error fetching postulaciones:', error);
+      console.error("Error fetching postulaciones:", error);
     }
   };
 
   const handleCrearVacante = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/vacantes`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          titulo: nuevaVacante.titulo,
-          descripcion: nuevaVacante.descripcion,
-          ubicacion: nuevaVacante.ubicacion,
-          salarioEstimado: nuevaVacante.salario ? parseFloat(nuevaVacante.salario) : undefined,
-          tipoContrato: nuevaVacante.tipoContrato,
-          modalidad: nuevaVacante.modalidad,
-          requisitos: nuevaVacante.requisitos,
-          preguntasJson: {
-            preguntas: [
-              nuevaVacante.pregunta1,
-              nuevaVacante.pregunta2,
-              nuevaVacante.pregunta3,
-            ].filter(p => p.trim() !== ''),
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/vacantes`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
-        }),
-      });
+          body: JSON.stringify({
+            titulo: nuevaVacante.titulo,
+            descripcion: nuevaVacante.descripcion,
+            ubicacion: nuevaVacante.ubicacion,
+            salarioEstimado: nuevaVacante.salario
+              ? parseFloat(nuevaVacante.salario)
+              : undefined,
+            tipoContrato: nuevaVacante.tipoContrato,
+            modalidad: nuevaVacante.modalidad,
+            requisitos: nuevaVacante.requisitos,
+            preguntasJson: {
+              preguntas: [
+                nuevaVacante.pregunta1,
+                nuevaVacante.pregunta2,
+                nuevaVacante.pregunta3,
+              ].filter((p) => p.trim() !== ""),
+            },
+          }),
+        }
+      );
 
       if (response.ok) {
-        alert('¡Vacante creada exitosamente!');
+        alert("¡Vacante creada exitosamente!");
         setNuevaVacante({
-          titulo: '',
-          descripcion: '',
-          ubicacion: '',
-          salario: '',
-          tipoContrato: 'FULL_TIME',
-          modalidad: 'PRESENCIAL',
-          requisitos: '',
-          pregunta1: '',
-          pregunta2: '',
-          pregunta3: '',
+          titulo: "",
+          descripcion: "",
+          ubicacion: "",
+          salario: "",
+          tipoContrato: "FULL_TIME",
+          modalidad: "PRESENCIAL",
+          requisitos: "",
+          pregunta1: "",
+          pregunta2: "",
+          pregunta3: "",
         });
-        setActiveTab('vacantes');
+        setActiveTab("vacantes");
         window.location.reload();
       } else {
-        alert('Error al crear la vacante');
+        alert("Error al crear la vacante");
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al crear la vacante');
+      console.error("Error:", error);
+      alert("Error al crear la vacante");
     }
   };
 
   const handleEliminarVacante = async (vacanteId: number) => {
-    if (!confirm('¿Estás seguro de eliminar esta vacante?')) return;
+    if (!confirm("¿Estás seguro de eliminar esta vacante?")) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/vacantes/${vacanteId}`,
         {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Authorization': `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
 
       if (response.ok) {
-        alert('Vacante eliminada');
+        alert("Vacante eliminada");
         window.location.reload();
       } else {
-        alert('Error al eliminar la vacante');
+        alert("Error al eliminar la vacante");
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al eliminar la vacante');
+      console.error("Error:", error);
+      alert("Error al eliminar la vacante");
     }
   };
 
@@ -190,14 +200,14 @@ export default function DashboardEmpresaPage() {
     nuevoEstado: string
   ) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/postulaciones/${postulacionId}`,
         {
-          method: 'PATCH',
+          method: "PATCH",
           headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({ estado: nuevoEstado }),
         }
@@ -210,11 +220,11 @@ export default function DashboardEmpresaPage() {
           fetchPostulacionesByVacante(postulaciones[0].vacante.id);
         }
       } else {
-        alert('Error al actualizar la postulación');
+        alert("Error al actualizar la postulación");
       }
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error al actualizar la postulación');
+      console.error("Error:", error);
+      alert("Error al actualizar la postulación");
     }
   };
 
@@ -229,9 +239,13 @@ export default function DashboardEmpresaPage() {
     );
   }
 
-  const postulacionesPendientes = postulaciones.filter(p => p.estado === 'PENDIENTE').length;
-  const postulacionesAprobadas = postulaciones.filter(p => p.estado === 'SELECCIONADO').length;
-  const vacantesActivas = vacantes.filter(v => v.activa).length;
+  const postulacionesPendientes = postulaciones.filter(
+    (p) => p.estado === "PENDIENTE"
+  ).length;
+  const postulacionesAprobadas = postulaciones.filter(
+    (p) => p.estado === "SELECCIONADO"
+  ).length;
+  const vacantesActivas = vacantes.filter((v) => v.activa).length;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -244,7 +258,9 @@ export default function DashboardEmpresaPage() {
                 <Building2 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-800">Portal de Empresa</h1>
+                <h1 className="text-xl font-bold text-gray-800">
+                  Portal de Empresa
+                </h1>
                 <p className="text-sm text-gray-600">{empresa?.nombre}</p>
               </div>
             </div>
@@ -266,38 +282,54 @@ export default function DashboardEmpresaPage() {
             <div className="bg-blue-50 rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-blue-600 font-medium">Vacantes Activas</p>
-                  <p className="text-3xl font-bold text-blue-700 mt-1">{vacantesActivas}</p>
+                  <p className="text-sm text-blue-600 font-medium">
+                    Vacantes Activas
+                  </p>
+                  <p className="text-3xl font-bold text-blue-700 mt-1">
+                    {vacantesActivas}
+                  </p>
                 </div>
                 <Briefcase className="w-10 h-10 text-blue-600 opacity-50" />
               </div>
             </div>
-            
+
             <div className="bg-yellow-50 rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-yellow-600 font-medium">Pendientes</p>
-                  <p className="text-3xl font-bold text-yellow-700 mt-1">{postulacionesPendientes}</p>
+                  <p className="text-sm text-yellow-600 font-medium">
+                    Pendientes
+                  </p>
+                  <p className="text-3xl font-bold text-yellow-700 mt-1">
+                    {postulacionesPendientes}
+                  </p>
                 </div>
                 <Clock className="w-10 h-10 text-yellow-600 opacity-50" />
               </div>
             </div>
-            
+
             <div className="bg-green-50 rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-green-600 font-medium">Aprobadas</p>
-                  <p className="text-3xl font-bold text-green-700 mt-1">{postulacionesAprobadas}</p>
+                  <p className="text-sm text-green-600 font-medium">
+                    Aprobadas
+                  </p>
+                  <p className="text-3xl font-bold text-green-700 mt-1">
+                    {postulacionesAprobadas}
+                  </p>
                 </div>
                 <CheckCircle className="w-10 h-10 text-green-600 opacity-50" />
               </div>
             </div>
-            
+
             <div className="bg-purple-50 rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-purple-600 font-medium">Total Postulaciones</p>
-                  <p className="text-3xl font-bold text-purple-700 mt-1">{postulaciones.length}</p>
+                  <p className="text-sm text-purple-600 font-medium">
+                    Total Postulaciones
+                  </p>
+                  <p className="text-3xl font-bold text-purple-700 mt-1">
+                    {postulaciones.length}
+                  </p>
                 </div>
                 <Users className="w-10 h-10 text-purple-600 opacity-50" />
               </div>
@@ -311,11 +343,11 @@ export default function DashboardEmpresaPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex gap-8">
             <button
-              onClick={() => setActiveTab('vacantes')}
+              onClick={() => setActiveTab("vacantes")}
               className={`py-4 px-2 border-b-2 font-medium transition-all ${
-                activeTab === 'vacantes'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-800'
+                activeTab === "vacantes"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-800"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -324,11 +356,11 @@ export default function DashboardEmpresaPage() {
               </div>
             </button>
             <button
-              onClick={() => setActiveTab('postulaciones')}
+              onClick={() => setActiveTab("postulaciones")}
               className={`py-4 px-2 border-b-2 font-medium transition-all ${
-                activeTab === 'postulaciones'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-800'
+                activeTab === "postulaciones"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-800"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -337,11 +369,11 @@ export default function DashboardEmpresaPage() {
               </div>
             </button>
             <button
-              onClick={() => setActiveTab('crear')}
+              onClick={() => setActiveTab("crear")}
               className={`py-4 px-2 border-b-2 font-medium transition-all ${
-                activeTab === 'crear'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-800'
+                activeTab === "crear"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-800"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -350,11 +382,11 @@ export default function DashboardEmpresaPage() {
               </div>
             </button>
             <button
-              onClick={() => setActiveTab('perfil')}
+              onClick={() => setActiveTab("perfil")}
               className={`py-4 px-2 border-b-2 font-medium transition-all ${
-                activeTab === 'perfil'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-800'
+                activeTab === "perfil"
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-800"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -369,14 +401,14 @@ export default function DashboardEmpresaPage() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Mis Vacantes Tab */}
-        {activeTab === 'vacantes' && (
+        {activeTab === "vacantes" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-800">
                 Mis Vacantes ({vacantes.length})
               </h2>
               <button
-                onClick={() => setActiveTab('crear')}
+                onClick={() => setActiveTab("crear")}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
               >
                 <Plus size={20} />
@@ -399,11 +431,11 @@ export default function DashboardEmpresaPage() {
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
                             vacante.activa
-                              ? 'bg-green-100 text-green-800'
-                              : 'bg-gray-100 text-gray-800'
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
                           }`}
                         >
-                          {vacante.activa ? 'Activa' : 'Inactiva'}
+                          {vacante.activa ? "Activa" : "Inactiva"}
                         </span>
                       </div>
 
@@ -418,8 +450,8 @@ export default function DashboardEmpresaPage() {
                         </div>
                         {vacante.salario && (
                           <div className="flex items-center gap-1">
-                            <DollarSign size={16} />
-                            ${vacante.salario.toLocaleString()} CLP
+                            <DollarSign size={16} />$
+                            {vacante.salario.toLocaleString()} CLP
                           </div>
                         )}
                         <div className="flex items-center gap-1">
@@ -456,7 +488,7 @@ export default function DashboardEmpresaPage() {
                     Crea tu primera vacante para empezar a recibir postulaciones
                   </p>
                   <button
-                    onClick={() => setActiveTab('crear')}
+                    onClick={() => setActiveTab("crear")}
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                   >
                     Crear Vacante
@@ -468,7 +500,7 @@ export default function DashboardEmpresaPage() {
         )}
 
         {/* Postulaciones Tab */}
-        {activeTab === 'postulaciones' && (
+        {activeTab === "postulaciones" && (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-800">
               Postulaciones Recibidas ({postulaciones.length})
@@ -497,7 +529,10 @@ export default function DashboardEmpresaPage() {
                       </div>
 
                       <p className="text-gray-600 mb-3">
-                        Vacante: <span className="font-medium">{postulacion.vacante.titulo}</span>
+                        Vacante:{" "}
+                        <span className="font-medium">
+                          {postulacion.vacante.titulo}
+                        </span>
                       </p>
 
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
@@ -505,8 +540,12 @@ export default function DashboardEmpresaPage() {
                         {postulacion.candidato.telefono && (
                           <div>{postulacion.candidato.telefono}</div>
                         )}
-                        {postulacion.candidato.experienciaAnios !== undefined && (
-                          <div>{postulacion.candidato.experienciaAnios} años de experiencia</div>
+                        {postulacion.candidato.experienciaAnios !==
+                          undefined && (
+                          <div>
+                            {postulacion.candidato.experienciaAnios} años de
+                            experiencia
+                          </div>
                         )}
                       </div>
 
@@ -523,23 +562,35 @@ export default function DashboardEmpresaPage() {
                     </div>
 
                     <div className="ml-4">
-                      <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getEstadoColor(postulacion.estado)}`}>
+                      <span
+                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${getEstadoColor(postulacion.estado)}`}
+                      >
                         {postulacion.estado}
                       </span>
                     </div>
                   </div>
 
-                  {postulacion.estado === 'PENDIENTE' && (
+                  {postulacion.estado === "PENDIENTE" && (
                     <div className="flex gap-3 pt-4 border-t">
                       <button
-                        onClick={() => handleCambiarEstadoPostulacion(postulacion.id, 'SELECCIONADO')}
+                        onClick={() =>
+                          handleCambiarEstadoPostulacion(
+                            postulacion.id,
+                            "SELECCIONADO"
+                          )
+                        }
                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-all"
                       >
                         <CheckCircle size={20} />
                         Aprobar
                       </button>
                       <button
-                        onClick={() => handleCambiarEstadoPostulacion(postulacion.id, 'Rechazado')}
+                        onClick={() =>
+                          handleCambiarEstadoPostulacion(
+                            postulacion.id,
+                            "Rechazado"
+                          )
+                        }
                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-all"
                       >
                         <XCircle size={20} />
@@ -557,7 +608,8 @@ export default function DashboardEmpresaPage() {
                     No hay postulaciones aún
                   </h3>
                   <p className="text-gray-600">
-                    Las postulaciones aparecerán aquí cuando los candidatos apliquen a tus vacantes
+                    Las postulaciones aparecerán aquí cuando los candidatos
+                    apliquen a tus vacantes
                   </p>
                 </div>
               )}
@@ -566,11 +618,16 @@ export default function DashboardEmpresaPage() {
         )}
 
         {/* Crear Vacante Tab */}
-        {activeTab === 'crear' && (
+        {activeTab === "crear" && (
           <div className="max-w-3xl">
-            <h2 className="text-2xl font-bold text-gray-800 mb-6">Crear Nueva Vacante</h2>
+            <h2 className="text-2xl font-bold text-gray-800 mb-6">
+              Crear Nueva Vacante
+            </h2>
 
-            <form onSubmit={handleCrearVacante} className="bg-white rounded-xl shadow-sm border p-6 space-y-6">
+            <form
+              onSubmit={handleCrearVacante}
+              className="bg-white rounded-xl shadow-sm border p-6 space-y-6"
+            >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Título de la Vacante *
@@ -579,7 +636,9 @@ export default function DashboardEmpresaPage() {
                   type="text"
                   required
                   value={nuevaVacante.titulo}
-                  onChange={(e) => setNuevaVacante({ ...nuevaVacante, titulo: e.target.value })}
+                  onChange={(e) =>
+                    setNuevaVacante({ ...nuevaVacante, titulo: e.target.value })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Ej: Desarrollador Full Stack"
                 />
@@ -593,7 +652,12 @@ export default function DashboardEmpresaPage() {
                   rows={6}
                   required
                   value={nuevaVacante.descripcion}
-                  onChange={(e) => setNuevaVacante({ ...nuevaVacante, descripcion: e.target.value })}
+                  onChange={(e) =>
+                    setNuevaVacante({
+                      ...nuevaVacante,
+                      descripcion: e.target.value,
+                    })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Describe las responsabilidades y requisitos del puesto..."
                 />
@@ -608,7 +672,12 @@ export default function DashboardEmpresaPage() {
                     type="text"
                     required
                     value={nuevaVacante.ubicacion}
-                    onChange={(e) => setNuevaVacante({ ...nuevaVacante, ubicacion: e.target.value })}
+                    onChange={(e) =>
+                      setNuevaVacante({
+                        ...nuevaVacante,
+                        ubicacion: e.target.value,
+                      })
+                    }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Ej: Santiago, Chile"
                   />
@@ -621,7 +690,12 @@ export default function DashboardEmpresaPage() {
                   <input
                     type="number"
                     value={nuevaVacante.salario}
-                    onChange={(e) => setNuevaVacante({ ...nuevaVacante, salario: e.target.value })}
+                    onChange={(e) =>
+                      setNuevaVacante({
+                        ...nuevaVacante,
+                        salario: e.target.value,
+                      })
+                    }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="1500000"
                   />
@@ -636,7 +710,12 @@ export default function DashboardEmpresaPage() {
                   <select
                     required
                     value={nuevaVacante.tipoContrato}
-                    onChange={(e) => setNuevaVacante({ ...nuevaVacante, tipoContrato: e.target.value })}
+                    onChange={(e) =>
+                      setNuevaVacante({
+                        ...nuevaVacante,
+                        tipoContrato: e.target.value,
+                      })
+                    }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="FULL_TIME">Tiempo Completo</option>
@@ -654,7 +733,12 @@ export default function DashboardEmpresaPage() {
                   <select
                     required
                     value={nuevaVacante.modalidad}
-                    onChange={(e) => setNuevaVacante({ ...nuevaVacante, modalidad: e.target.value })}
+                    onChange={(e) =>
+                      setNuevaVacante({
+                        ...nuevaVacante,
+                        modalidad: e.target.value,
+                      })
+                    }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="PRESENCIAL">Presencial</option>
@@ -671,7 +755,12 @@ export default function DashboardEmpresaPage() {
                 <textarea
                   rows={4}
                   value={nuevaVacante.requisitos}
-                  onChange={(e) => setNuevaVacante({ ...nuevaVacante, requisitos: e.target.value })}
+                  onChange={(e) =>
+                    setNuevaVacante({
+                      ...nuevaVacante,
+                      requisitos: e.target.value,
+                    })
+                  }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Lista los requisitos principales del puesto..."
                 />
@@ -679,38 +768,60 @@ export default function DashboardEmpresaPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-4">
-                  Preguntas para Candidatos (3 preguntas requeridas para análisis IA) *
+                  Preguntas para Candidatos (3 preguntas requeridas para
+                  análisis IA) *
                 </label>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Pregunta 1 *</label>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Pregunta 1 *
+                    </label>
                     <input
                       type="text"
                       required
                       value={nuevaVacante.pregunta1}
-                      onChange={(e) => setNuevaVacante({ ...nuevaVacante, pregunta1: e.target.value })}
+                      onChange={(e) =>
+                        setNuevaVacante({
+                          ...nuevaVacante,
+                          pregunta1: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ej: ¿Cuántos años de experiencia tienes con React y Node.js?"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Pregunta 2 *</label>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Pregunta 2 *
+                    </label>
                     <input
                       type="text"
                       required
                       value={nuevaVacante.pregunta2}
-                      onChange={(e) => setNuevaVacante({ ...nuevaVacante, pregunta2: e.target.value })}
+                      onChange={(e) =>
+                        setNuevaVacante({
+                          ...nuevaVacante,
+                          pregunta2: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ej: Describe un proyecto complejo que hayas liderado"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-600 mb-1">Pregunta 3 *</label>
+                    <label className="block text-xs text-gray-600 mb-1">
+                      Pregunta 3 *
+                    </label>
                     <input
                       type="text"
                       required
                       value={nuevaVacante.pregunta3}
-                      onChange={(e) => setNuevaVacante({ ...nuevaVacante, pregunta3: e.target.value })}
+                      onChange={(e) =>
+                        setNuevaVacante({
+                          ...nuevaVacante,
+                          pregunta3: e.target.value,
+                        })
+                      }
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Ej: ¿Qué experiencia tienes con PostgreSQL y bases de datos?"
                     />
@@ -727,7 +838,7 @@ export default function DashboardEmpresaPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveTab('vacantes')}
+                  onClick={() => setActiveTab("vacantes")}
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all"
                 >
                   Cancelar
@@ -738,40 +849,56 @@ export default function DashboardEmpresaPage() {
         )}
 
         {/* Perfil Tab */}
-        {activeTab === 'perfil' && empresa && (
+        {activeTab === "perfil" && empresa && (
           <div className="max-w-3xl space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800">Perfil de la Empresa</h2>
+            <h2 className="text-2xl font-bold text-gray-800">
+              Perfil de la Empresa
+            </h2>
 
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <div className="flex items-start gap-6 mb-6">
                 <div className="w-24 h-24 bg-blue-100 rounded-lg flex items-center justify-center">
                   <Building2 className="w-12 h-12 text-blue-600" />
                 </div>
-                
+
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold text-gray-800 mb-2">{empresa.nombre}</h3>
-                  <p className="text-gray-600 mb-4">{empresa.descripcion || 'Sin descripción'}</p>
+                  <h3 className="text-2xl font-bold text-gray-800 mb-2">
+                    {empresa.nombre}
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    {empresa.descripcion || "Sin descripción"}
+                  </p>
                   <p className="text-sm text-gray-600">{empresa.correo}</p>
                 </div>
               </div>
 
               <div className="pt-6 border-t">
-                <h4 className="text-lg font-bold text-gray-800 mb-4">Estadísticas</h4>
+                <h4 className="text-lg font-bold text-gray-800 mb-4">
+                  Estadísticas
+                </h4>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
-                    <div className="text-3xl font-bold text-blue-600">{vacantes.length}</div>
+                    <div className="text-3xl font-bold text-blue-600">
+                      {vacantes.length}
+                    </div>
                     <div className="text-sm text-gray-600 mt-1">Vacantes</div>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
-                    <div className="text-3xl font-bold text-green-600">{vacantesActivas}</div>
+                    <div className="text-3xl font-bold text-green-600">
+                      {vacantesActivas}
+                    </div>
                     <div className="text-sm text-gray-600 mt-1">Activas</div>
                   </div>
                   <div className="text-center p-4 bg-yellow-50 rounded-lg">
-                    <div className="text-3xl font-bold text-yellow-600">{postulacionesPendientes}</div>
+                    <div className="text-3xl font-bold text-yellow-600">
+                      {postulacionesPendientes}
+                    </div>
                     <div className="text-sm text-gray-600 mt-1">Pendientes</div>
                   </div>
                   <div className="text-center p-4 bg-purple-50 rounded-lg">
-                    <div className="text-3xl font-bold text-purple-600">{postulaciones.length}</div>
+                    <div className="text-3xl font-bold text-purple-600">
+                      {postulaciones.length}
+                    </div>
                     <div className="text-sm text-gray-600 mt-1">Total</div>
                   </div>
                 </div>

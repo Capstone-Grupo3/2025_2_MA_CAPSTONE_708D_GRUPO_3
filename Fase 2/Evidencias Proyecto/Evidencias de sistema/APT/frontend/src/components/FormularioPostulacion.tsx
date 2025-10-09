@@ -1,10 +1,10 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Upload, File, X, CheckCircle } from 'lucide-react';
-import { CreatePostulacionDTO, PreguntaVacante } from '@/types';
-import { validateCvFile } from '@/lib/validators';
-import { CV_ALLOWED_TYPES, MAX_FILE_SIZE } from '@/lib/constants';
+import { useState } from "react";
+import { Upload, File, X, CheckCircle } from "lucide-react";
+import { CreatePostulacionDTO, PreguntaVacante } from "@/types";
+import { validateCvFile } from "@/lib/validators";
+import { CV_ALLOWED_TYPES, MAX_FILE_SIZE } from "@/lib/constants";
 
 interface FormularioPostulacionProps {
   vacanteId: number;
@@ -24,24 +24,28 @@ export default function FormularioPostulacion({
   const [cvFile, setCvFile] = useState<File | null>(null);
   const [respuestas, setRespuestas] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       // Validar tipo y tamaño
-      const validTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+      const validTypes = [
+        "application/pdf",
+        "application/msword",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+      ];
       if (!validTypes.includes(file.type)) {
-        setError('Solo se permiten archivos PDF o Word');
+        setError("Solo se permiten archivos PDF o Word");
         return;
       }
       if (file.size > 5 * 1024 * 1024) {
-        setError('El archivo debe ser menor a 5MB');
+        setError("El archivo debe ser menor a 5MB");
         return;
       }
       setCvFile(file);
-      setError('');
+      setError("");
     }
   };
 
@@ -51,27 +55,29 @@ export default function FormularioPostulacion({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setLoading(true);
 
     try {
       // Validar CV
       if (!cvFile) {
-        throw new Error('Debes subir tu CV');
+        throw new Error("Debes subir tu CV");
       }
 
       // Validar respuestas
       if (preguntas.length > 0) {
-        const respuestasCompletas = preguntas.every((_, index) => respuestas[index]?.trim());
+        const respuestasCompletas = preguntas.every((_, index) =>
+          respuestas[index]?.trim()
+        );
         if (!respuestasCompletas) {
-          throw new Error('Debes responder todas las preguntas');
+          throw new Error("Debes responder todas las preguntas");
         }
       }
 
       // Construir datos de postulación
       const respuestasArray = preguntas.map((p, index) => ({
         pregunta: p.pregunta,
-        respuesta: respuestas[index] || '',
+        respuesta: respuestas[index] || "",
       }));
 
       await onSubmit({
@@ -84,7 +90,9 @@ export default function FormularioPostulacion({
         onCancel();
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al enviar postulación');
+      setError(
+        err instanceof Error ? err.message : "Error al enviar postulación"
+      );
     } finally {
       setLoading(false);
     }
@@ -96,9 +104,12 @@ export default function FormularioPostulacion({
         <div className="flex justify-center mb-4">
           <CheckCircle className="w-16 h-16 text-green-500" />
         </div>
-        <h2 className="text-2xl font-bold text-gray-800 mb-2">¡Postulación Enviada!</h2>
+        <h2 className="text-2xl font-bold text-gray-800 mb-2">
+          ¡Postulación Enviada!
+        </h2>
         <p className="text-gray-600">
-          Tu postulación ha sido recibida exitosamente. El equipo de reclutamiento la revisará pronto.
+          Tu postulación ha sido recibida exitosamente. El equipo de
+          reclutamiento la revisará pronto.
         </p>
       </div>
     );
@@ -109,7 +120,9 @@ export default function FormularioPostulacion({
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-gray-800">Postular a Vacante</h2>
+          <h2 className="text-2xl font-bold text-gray-800">
+            Postular a Vacante
+          </h2>
           <p className="text-gray-600 mt-1">{vacanteTitulo}</p>
         </div>
         <button
@@ -152,7 +165,9 @@ export default function FormularioPostulacion({
                 <div className="flex items-center gap-3">
                   <File className="w-8 h-8 text-blue-600" />
                   <div className="text-left">
-                    <p className="text-sm font-medium text-gray-800">{cvFile.name}</p>
+                    <p className="text-sm font-medium text-gray-800">
+                      {cvFile.name}
+                    </p>
                     <p className="text-xs text-gray-500">
                       {(cvFile.size / 1024).toFixed(0)} KB
                     </p>
@@ -173,7 +188,9 @@ export default function FormularioPostulacion({
         {/* Preguntas Personalizadas */}
         {preguntas.length > 0 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-800">Preguntas del Empleador</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              Preguntas del Empleador
+            </h3>
             {preguntas.map((pregunta, index) => (
               <div key={index}>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -181,7 +198,7 @@ export default function FormularioPostulacion({
                 </label>
                 <textarea
                   rows={4}
-                  value={respuestas[index] || ''}
+                  value={respuestas[index] || ""}
                   onChange={(e) => handleRespuestaChange(index, e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   placeholder="Escribe tu respuesta aquí..."
@@ -206,7 +223,7 @@ export default function FormularioPostulacion({
             disabled={loading}
             className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Enviando...' : 'Enviar Postulación'}
+            {loading ? "Enviando..." : "Enviar Postulación"}
           </button>
         </div>
       </form>

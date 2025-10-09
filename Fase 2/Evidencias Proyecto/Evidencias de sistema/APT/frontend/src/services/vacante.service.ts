@@ -2,15 +2,15 @@
  * Servicio de Vacantes
  */
 
-import { Vacante, VacanteDetalle, CreateVacanteDTO } from '@/types';
-import apiService from './api.service';
+import { Vacante, VacanteDetalle, CreateVacanteDTO } from "@/types";
+import apiService from "./api.service";
 
 class VacanteService {
   /**
    * Obtener todas las vacantes activas
    */
   async getVacantes(): Promise<Vacante[]> {
-    return apiService.get<Vacante[]>('/vacantes');
+    return apiService.get<Vacante[]>("/vacantes");
   }
 
   /**
@@ -31,13 +31,16 @@ class VacanteService {
    * Crear nueva vacante
    */
   async createVacante(data: CreateVacanteDTO): Promise<VacanteDetalle> {
-    return apiService.post<VacanteDetalle>('/vacantes', data);
+    return apiService.post<VacanteDetalle>("/vacantes", data);
   }
 
   /**
    * Actualizar vacante
    */
-  async updateVacante(id: number, data: Partial<CreateVacanteDTO>): Promise<VacanteDetalle> {
+  async updateVacante(
+    id: number,
+    data: Partial<CreateVacanteDTO>
+  ): Promise<VacanteDetalle> {
     return apiService.patch<VacanteDetalle>(`/vacantes/${id}`, data);
   }
 
@@ -51,7 +54,10 @@ class VacanteService {
   /**
    * Activar/Desactivar vacante
    */
-  async toggleVacanteStatus(id: number, activa: boolean): Promise<VacanteDetalle> {
+  async toggleVacanteStatus(
+    id: number,
+    activa: boolean
+  ): Promise<VacanteDetalle> {
     return apiService.patch<VacanteDetalle>(`/vacantes/${id}`, { activa });
   }
 }

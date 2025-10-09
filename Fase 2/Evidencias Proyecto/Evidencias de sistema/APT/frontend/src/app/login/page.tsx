@@ -1,38 +1,38 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useState } from 'react';
-import { Briefcase, Eye, EyeOff } from 'lucide-react';
-import { UserType } from '@/types';
-import { useAuth } from '@/hooks/useAuth';
-import { validateEmail, validatePassword } from '@/lib/validators';
+import Link from "next/link";
+import { useState } from "react";
+import { Briefcase, Eye, EyeOff } from "lucide-react";
+import { UserType } from "@/types";
+import { useAuth } from "@/hooks/useAuth";
+import { validateEmail, validatePassword } from "@/lib/validators";
 
 export default function LoginPage() {
   const { loginEmpresa, loginCandidato, loading, error: authError } = useAuth();
-  
-  const [tipoUsuario, setTipoUsuario] = useState<UserType>('candidato');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+
+  const [tipoUsuario, setTipoUsuario] = useState<UserType>("candidato");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     if (!validateEmail(email)) {
-      setError('Por favor ingresa un correo válido');
+      setError("Por favor ingresa un correo válido");
       return;
     }
 
     if (!validatePassword(password)) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+      setError("La contraseña debe tener al menos 6 caracteres");
       return;
     }
 
     const credentials = { correo: email, contrasena: password };
 
-    if (tipoUsuario === 'empresa') {
+    if (tipoUsuario === "empresa") {
       await loginEmpresa(credentials);
     } else {
       await loginCandidato(credentials);
@@ -55,22 +55,22 @@ export default function LoginPage() {
         <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-lg">
           <button
             type="button"
-            onClick={() => setTipoUsuario('candidato')}
+            onClick={() => setTipoUsuario("candidato")}
             className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
-              tipoUsuario === 'candidato'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
+              tipoUsuario === "candidato"
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-600 hover:text-gray-800"
             }`}
           >
             Candidato
           </button>
           <button
             type="button"
-            onClick={() => setTipoUsuario('empresa')}
+            onClick={() => setTipoUsuario("empresa")}
             className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
-              tipoUsuario === 'empresa'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
+              tipoUsuario === "empresa"
+                ? "bg-white text-blue-600 shadow-sm"
+                : "text-gray-600 hover:text-gray-800"
             }`}
           >
             Empresa
@@ -85,7 +85,10 @@ export default function LoginPage() {
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Email
             </label>
             <input
@@ -100,13 +103,16 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 mb-2"
+            >
               Contraseña
             </label>
             <div className="relative">
               <input
                 id="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -128,14 +134,17 @@ export default function LoginPage() {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+            {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
           </button>
         </form>
 
         <div className="mt-6 text-center">
           <p className="text-gray-600 text-sm">
-            ¿No tienes cuenta?{' '}
-            <Link href="/registro" className="text-blue-600 font-medium hover:underline">
+            ¿No tienes cuenta?{" "}
+            <Link
+              href="/registro"
+              className="text-blue-600 font-medium hover:underline"
+            >
               Regístrate aquí
             </Link>
           </p>

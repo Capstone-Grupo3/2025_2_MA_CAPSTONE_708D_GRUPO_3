@@ -1,5 +1,5 @@
-import Link from 'next/link';
-import { Briefcase, Target, Users, Zap } from 'lucide-react';
+import Link from "next/link";
+import { Briefcase, Target, Users, Zap } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -12,10 +12,7 @@ export default function HomePage() {
             <span className="text-2xl font-bold text-gray-900">APT</span>
           </div>
           <div className="flex items-center space-x-4">
-            <Link
-              href="/login"
-              className="text-gray-600 hover:text-gray-900"
-            >
+            <Link href="/login" className="text-gray-600 hover:text-gray-900">
               Iniciar Sesión
             </Link>
             <Link
@@ -63,9 +60,12 @@ export default function HomePage() {
             <div className="mb-4 flex justify-center">
               <Zap className="h-12 w-12 text-primary-600" />
             </div>
-            <h3 className="mb-2 text-xl font-semibold">Evaluación Automática</h3>
+            <h3 className="mb-2 text-xl font-semibold">
+              Evaluación Automática
+            </h3>
             <p className="text-gray-600">
-              IA analiza CVs y respuestas para generar puntajes de compatibilidad
+              IA analiza CVs y respuestas para generar puntajes de
+              compatibilidad
             </p>
           </div>
 
@@ -112,7 +112,10 @@ export default function HomePage() {
       {/* Footer */}
       <footer className="border-t bg-gray-50 py-8">
         <div className="container mx-auto px-4 text-center text-gray-600">
-          <p>&copy; 2025 APT - Advanced People Tracking. Todos los derechos reservados.</p>
+          <p>
+            &copy; 2025 APT - Advanced People Tracking. Todos los derechos
+            reservados.
+          </p>
         </div>
       </footer>
     </div>

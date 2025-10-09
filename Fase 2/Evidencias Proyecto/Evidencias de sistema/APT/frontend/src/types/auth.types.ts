@@ -2,7 +2,7 @@
  * Tipos relacionados con Autenticación
  */
 
-export type UserType = 'empresa' | 'candidato';
+export type UserType = "empresa" | "candidato";
 
 export interface LoginCredentials {
   correo: string;

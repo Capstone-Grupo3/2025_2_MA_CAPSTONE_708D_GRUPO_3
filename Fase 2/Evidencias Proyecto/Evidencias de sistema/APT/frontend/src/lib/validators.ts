@@ -2,7 +2,7 @@
  * Funciones de validación
  */
 
-import { CV_ALLOWED_TYPES, MAX_FILE_SIZE } from './constants';
+import { CV_ALLOWED_TYPES, MAX_FILE_SIZE } from "./constants";
 
 /**
  * Valida un correo electrónico
@@ -32,24 +32,25 @@ export function validatePhone(phone: string): boolean {
  */
 export function validateRut(rut: string): boolean {
   // Eliminar puntos y guión
-  const cleanRut = rut.replace(/\./g, '').replace(/-/g, '');
-  
+  const cleanRut = rut.replace(/\./g, "").replace(/-/g, "");
+
   // Separar número y dígito verificador
   const rutNumber = cleanRut.slice(0, -1);
   const dv = cleanRut.slice(-1).toUpperCase();
-  
+
   // Calcular dígito verificador
   let suma = 0;
   let multiplo = 2;
-  
+
   for (let i = rutNumber.length - 1; i >= 0; i--) {
     suma += parseInt(rutNumber.charAt(i)) * multiplo;
     multiplo = multiplo < 7 ? multiplo + 1 : 2;
   }
-  
+
   const dvEsperado = 11 - (suma % 11);
-  const dvCalculado = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
-  
+  const dvCalculado =
+    dvEsperado === 11 ? "0" : dvEsperado === 10 ? "K" : dvEsperado.toString();
+
   return dv === dvCalculado;
 }
 
@@ -61,18 +62,18 @@ export function validateCvFile(file: File): { valid: boolean; error?: string } {
   if (!CV_ALLOWED_TYPES.includes(file.type)) {
     return {
       valid: false,
-      error: 'Solo se permiten archivos PDF o Word',
+      error: "Solo se permiten archivos PDF o Word",
     };
   }
-  
+
   // Validar tamaño
   if (file.size > MAX_FILE_SIZE) {
     return {
       valid: false,
-      error: 'El archivo no debe superar los 5MB',
+      error: "El archivo no debe superar los 5MB",
     };
   }
-  
+
   return { valid: true };
 }
 

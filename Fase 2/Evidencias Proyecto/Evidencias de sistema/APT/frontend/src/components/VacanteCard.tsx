@@ -1,6 +1,11 @@
-import { MapPin, Clock, DollarSign, Briefcase } from 'lucide-react';
-import { TipoContrato, Modalidad } from '@/types';
-import { getTipoContratoLabel, getModalidadLabel, formatSalaryRange, formatDateShort } from '@/lib/formatters';
+import { MapPin, Clock, DollarSign, Briefcase } from "lucide-react";
+import { TipoContrato, Modalidad } from "@/types";
+import {
+  getTipoContratoLabel,
+  getModalidadLabel,
+  formatSalaryRange,
+  formatDateShort,
+} from "@/lib/formatters";
 
 interface VacanteCardProps {
   id: number;
@@ -36,8 +41,8 @@ export default function VacanteCard({
     const diffTime = Math.abs(now.getTime() - date.getTime());
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-    if (diffDays === 0) return 'Hoy';
-    if (diffDays === 1) return 'Ayer';
+    if (diffDays === 0) return "Hoy";
+    if (diffDays === 1) return "Ayer";
     if (diffDays < 7) return `Hace ${diffDays} días`;
     if (diffDays < 30) return `Hace ${Math.floor(diffDays / 7)} semanas`;
     return `Hace ${Math.floor(diffDays / 30)} meses`;
@@ -63,7 +68,7 @@ export default function VacanteCard({
           <h3 className="text-xl font-bold text-gray-800 mb-1">{titulo}</h3>
           <p className="text-gray-600 font-medium">{empresaNombre}</p>
         </div>
-        {estado === 'ACTIVO' && (
+        {estado === "ACTIVO" && (
           <span className="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">
             Activo
           </span>
@@ -102,7 +107,9 @@ export default function VacanteCard({
 
       {/* Footer */}
       <div className="flex justify-between items-center pt-4 border-t border-gray-200">
-        <span className="text-xs text-gray-500">{formatFecha(fecha_publicacion)}</span>
+        <span className="text-xs text-gray-500">
+          {formatFecha(fecha_publicacion)}
+        </span>
         <button className="text-blue-600 font-medium text-sm hover:text-blue-700 transition-colors">
           Ver detalles →
         </button>

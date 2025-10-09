@@ -2,8 +2,8 @@
  * Servicio de Autenticación
  */
 
-import { LoginCredentials, LoginResponse } from '@/types';
-import apiService from './api.service';
+import { LoginCredentials, LoginResponse } from "@/types";
+import apiService from "./api.service";
 
 class AuthService {
   /**
@@ -11,11 +11,11 @@ class AuthService {
    */
   async loginEmpresa(credentials: LoginCredentials): Promise<LoginResponse> {
     const response = await apiService.post<LoginResponse>(
-      '/auth/login/empresa',
+      "/auth/login/empresa",
       credentials,
       false // No requiere autenticación
     );
-    
+
     return response;
   }
 
@@ -24,11 +24,11 @@ class AuthService {
    */
   async loginCandidato(credentials: LoginCredentials): Promise<LoginResponse> {
     const response = await apiService.post<LoginResponse>(
-      '/auth/login/candidato',
+      "/auth/login/candidato",
       credentials,
       false // No requiere autenticación
     );
-    
+
     return response;
   }
 
@@ -36,9 +36,9 @@ class AuthService {
    * Logout (limpiar datos locales)
    */
   logout(): void {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('token');
-      localStorage.removeItem('userType');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token");
+      localStorage.removeItem("userType");
     }
   }
 
@@ -46,8 +46,8 @@ class AuthService {
    * Obtener token actual
    */
   getToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("token");
     }
     return null;
   }
@@ -55,9 +55,9 @@ class AuthService {
   /**
    * Obtener tipo de usuario actual
    */
-  getUserType(): 'empresa' | 'candidato' | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('userType') as 'empresa' | 'candidato' | null;
+  getUserType(): "empresa" | "candidato" | null {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("userType") as "empresa" | "candidato" | null;
     }
     return null;
   }
@@ -72,10 +72,10 @@ class AuthService {
   /**
    * Guardar token y tipo de usuario
    */
-  saveAuth(token: string, userType: 'empresa' | 'candidato'): void {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('token', token);
-      localStorage.setItem('userType', userType);
+  saveAuth(token: string, userType: "empresa" | "candidato"): void {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("token", token);
+      localStorage.setItem("userType", userType);
     }
   }
 }

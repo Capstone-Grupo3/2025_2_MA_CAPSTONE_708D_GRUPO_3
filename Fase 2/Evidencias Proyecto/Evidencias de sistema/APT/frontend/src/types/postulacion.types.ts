@@ -2,15 +2,15 @@
  * Tipos relacionados con Postulaciones
  */
 
-import { Candidato } from './candidato.types';
-import { Vacante } from './vacante.types';
+import { Candidato } from "./candidato.types";
+import { Vacante } from "./vacante.types";
 
-export type EstadoPostulacion = 
-  | 'PENDIENTE' 
-  | 'EN_REVISION' 
-  | 'EVALUADO' 
-  | 'RECHAZADO' 
-  | 'SELECCIONADO';
+export type EstadoPostulacion =
+  | "PENDIENTE"
+  | "EN_REVISION"
+  | "EVALUADO"
+  | "RECHAZADO"
+  | "SELECCIONADO";
 
 export interface Postulacion {
   id: number;

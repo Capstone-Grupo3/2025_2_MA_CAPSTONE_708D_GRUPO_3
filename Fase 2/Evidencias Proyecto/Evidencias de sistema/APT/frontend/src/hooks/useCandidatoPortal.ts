@@ -2,15 +2,15 @@
  * Hook para el portal del candidato
  */
 
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { candidatoService } from '@/services/candidato.service';
-import { vacanteService } from '@/services/vacante.service';
-import { postulacionService } from '@/services/postulacion.service';
-import { authService } from '@/services/auth.service';
-import { Candidato, Vacante, Postulacion } from '@/types';
+import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
+import { candidatoService } from "@/services/candidato.service";
+import { vacanteService } from "@/services/vacante.service";
+import { postulacionService } from "@/services/postulacion.service";
+import { authService } from "@/services/auth.service";
+import { Candidato, Vacante, Postulacion } from "@/types";
 
 export function useCandidatoPortal() {
   const router = useRouter();
@@ -31,39 +31,40 @@ export function useCandidatoPortal() {
       // Verificar autenticación
       const token = authService.getToken();
       if (!token) {
-        router.push('/login');
+        router.push("/login");
         return;
       }
 
       // Decodificar token para obtener ID
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const payload = JSON.parse(atob(token.split(".")[1]));
       const candidatoId = payload.sub;
 
-      console.log('🔍 Cargando datos para candidato ID:', candidatoId);
+      console.log("🔍 Cargando datos para candidato ID:", candidatoId);
 
       // Cargar perfil
-      const perfilData = await candidatoService.getCandidatoProfile(candidatoId);
-      console.log('👤 Perfil candidato:', perfilData);
+      const perfilData =
+        await candidatoService.getCandidatoProfile(candidatoId);
+      console.log("👤 Perfil candidato:", perfilData);
       setCandidato(perfilData);
 
       // Cargar vacantes activas
       const vacantesData = await vacanteService.getVacantes();
-      console.log('💼 Vacantes disponibles:', vacantesData.length);
+      console.log("💼 Vacantes disponibles:", vacantesData.length);
       setVacantes(vacantesData);
 
       // Cargar postulaciones del candidato
-      const postulacionesData = await postulacionService.getPostulacionesByCandidato(candidatoId);
-      console.log('📋 Postulaciones del candidato:', postulacionesData.length);
+      const postulacionesData =
+        await postulacionService.getPostulacionesByCandidato(candidatoId);
+      console.log("📋 Postulaciones del candidato:", postulacionesData.length);
       setPostulaciones(postulacionesData);
-
     } catch (err: any) {
-      console.error('❌ Error cargando datos:', err);
-      setError(err.message || 'Error al cargar los datos');
-      
+      console.error("❌ Error cargando datos:", err);
+      setError(err.message || "Error al cargar los datos");
+
       // Si es error de autenticación, redirigir a login
       if (err.statusCode === 401) {
         authService.logout();
-        router.push('/login');
+        router.push("/login");
       }
     } finally {
       setLoading(false);
@@ -82,7 +83,7 @@ export function useCandidatoPortal() {
    */
   const logout = useCallback(() => {
     authService.logout();
-    router.push('/login');
+    router.push("/login");
   }, [router]);
 
   // Cargar datos al montar

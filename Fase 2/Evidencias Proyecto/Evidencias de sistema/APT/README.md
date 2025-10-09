@@ -15,24 +15,31 @@ APT es un sistema integral que conecta empresas con candidatos, utilizando intel
 git clone <url-repo>
 cd APT
 
-# 2. Configurar variables de entorno (ver más abajo)
+# 2. Configurar variables de entorno
+# Copia los archivos .env.example y configúralos:
+cp backend/.env.example backend/.env
+cp frontend/.env.example frontend/.env.local
 
 # 3. Iniciar con Docker
-.\start-mvp.ps1
+.\start-dev.ps1
 
 # 4. Acceder a:
 # - Frontend: http://localhost:3001
 # - Backend API: http://localhost:3000/api
-# - AI Service: http://localhost:8000/docs
 # - n8n: http://localhost:5678 (admin/admin123)
 ```
 
-**📚 Documentación completa:** Ver carpeta **[docs-mvp/](./docs-mvp/)**
-- **[INICIO-RAPIDO.md](./docs-mvp/INICIO-RAPIDO.md)** - Guía de 5 minutos ⭐
-- **[GUIA-MVP-DOCKER.md](./docs-mvp/GUIA-MVP-DOCKER.md)** - Documentación completa
-- **[ARQUITECTURA-MVP.md](./docs-mvp/ARQUITECTURA-MVP.md)** - Diagramas del sistema
-- **[CASOS-USO-N8N.md](./docs-mvp/CASOS-USO-N8N.md)** - Automatización con n8n
-- **[CHECKLIST-MVP.md](./docs-mvp/CHECKLIST-MVP.md)** - Verificación paso a paso
+**Para detener:**
+```powershell
+.\stop-dev.ps1
+```
+
+**📚 Documentación del Proyecto:**
+- **[INICIO-RAPIDO.md](./docs-mvp/INICIO-RAPIDO.md)** - ⭐ Guía de inicio en 5 minutos
+- **[PRUEBA-END-TO-END.md](./docs-mvp/PRUEBA-END-TO-END.md)** - Guía de pruebas E2E
+- **[RESUMEN-FINAL.md](./docs-mvp/RESUMEN-FINAL.md)** - Resumen del proyecto
+- **[ARCHITECTURE.md](./frontend/ARCHITECTURE.md)** - Arquitectura del frontend
+- **[INTEGRACION-N8N.md](./backend/INTEGRACION-N8N.md)** - Integración con n8n
 
 ## 🛠 Stack Tecnológico
 
@@ -50,15 +57,15 @@ cd APT
 - **JWT + Bcrypt** para seguridad
 - REST API + Swagger
 
-### Inteligencia Artificial
-- **Python 3.11** + **FastAPI**
-- **Hugging Face Transformers**
-- **scikit-learn** + **spaCy** (es_core_news_sm)
-- Análisis de CVs y respuestas
+### Inteligencia Artificial (Integrada en n8n)
+- **n8n** como orquestador de workflows de IA
+- **OpenAI API** para análisis de CVs y respuestas
+- Evaluación automática de compatibilidad
+- Scoring y feedback inteligente
 
 ### Infraestructura
 - **Docker** + Docker Compose
-- **n8n** para automatización de workflows
+- **n8n** para automatización y procesamiento IA
 - **Supabase** para base de datos y storage
 - **GitHub Actions** para CI/CD
 
@@ -91,43 +98,24 @@ APT/
 │   ├── postcss.config.js
 │   └── .dockerignore
 │
-├── ai/                        # Python FastAPI
-│   ├── api/
-│   │   ├── main.py            # FastAPI app
-│   │   ├── services/          # Servicios de IA
-│   │   └── models/            # Modelos ML
-│   ├── requirements.txt
-│   ├── Dockerfile
-│   └── .dockerignore
+├── docs-mvp/                  # Documentación del proyecto
+│   ├── PRUEBA-END-TO-END.md   # Guía de pruebas E2E
+│   ├── RESUMEN-FINAL.md       # Resumen del proyecto
+│   └── n8n-workflows/         # Workflows exportados de n8n
+│       └── evaluacion-ia-completa.json
 │
-├── n8n/                       # Automatización de workflows
-│   └── workflows/
-│       ├── evaluacion-cv.json           # Evaluación automática con IA
-│       └── recordatorio-entrevistas.json # Notificaciones
-│
-├── docs-mvp/                  # Documentación completa del MVP
-│   ├── README.md              # Índice de documentación
-│   ├── INICIO-RAPIDO.md       # Guía de 5 minutos
-│   ├── GUIA-MVP-DOCKER.md     # Documentación completa
-│   ├── ARQUITECTURA-MVP.md    # Diagramas del sistema
-│   ├── CASOS-USO-N8N.md       # Automatización con n8n
-│   ├── CHECKLIST-MVP.md       # Verificación paso a paso
-│   └── RESUMEN.md             # Resumen ejecutivo
-│
-├── docker-compose.yml         # Base de datos local
-├── docker-compose.mvp.yml     # Stack completo (Backend, Frontend, AI, n8n, DB)
-│
-├── start-mvp.ps1              # Script de inicio rápido
-└── stop-mvp.ps1               # Script de detención
+├── docker-compose.mvp.yml     # Stack completo (Backend, Frontend, n8n)
+├── start-dev.ps1              # Script de inicio rápido
+└── stop-dev.ps1               # Script de detención
 ```
 
 ## 🚀 Instalación
 
 ### Prerrequisitos
 - Node.js >= 18
-- Python >= 3.9
 - Docker y Docker Compose
-- PostgreSQL (o cuenta en Supabase)
+- Cuenta en Supabase (base de datos PostgreSQL)
+- API Key de OpenAI (para funcionalidad de IA en n8n)
 
 ### Configuración
 
@@ -144,9 +132,6 @@ cp backend/.env.example backend/.env
 
 # Frontend
 cp frontend/.env.example frontend/.env
-
-# AI Service
-cp ai/.env.example ai/.env
 ```
 
 3. **Instalar dependencias**
@@ -159,10 +144,6 @@ npm install
 # Frontend
 cd ../frontend
 npm install
-
-# AI Service
-cd ../ai
-pip install -r requirements.txt
 ```
 
 4. **Configurar base de datos**
@@ -183,14 +164,18 @@ docker-compose up -d
 
 **Todo el stack en un comando:**
 ```powershell
-.\start-mvp.ps1
+.\start-dev.ps1
 ```
 
 Accede a:
 - Frontend: http://localhost:3001
 - Backend API: http://localhost:3000/api
-- AI Service: http://localhost:8000/docs
 - n8n: http://localhost:5678 (admin/admin123)
+
+**Para detener:**
+```powershell
+.\stop-dev.ps1
+```
 
 ### Opción 2: Desarrollo Local
 
@@ -219,16 +204,11 @@ npm run dev
 
 Aplicación disponible en: `http://localhost:3001`
 
-#### AI Service (FastAPI)
-```bash
-cd ai
-pip install -r requirements.txt
-python -m spacy download es_core_news_sm
-uvicorn api.main:app --reload --port 8000
-```
-API IA disponible en: `http://localhost:8000`
+#### n8n (Automatización + IA)
 
-#### n8n (Automatización)
+n8n está incluido en el docker-compose y se ejecuta automáticamente con `.\start-dev.ps1`
+
+Para ejecutar n8n de forma independiente:
 ```bash
 docker run -it --rm \
   -p 5678:5678 \
@@ -239,20 +219,14 @@ n8n disponible en: `http://localhost:5678`
 
 ## 📚 Documentación
 
-### Documentación MVP (Inicio Rápido)
-- **[INICIO-RAPIDO.md](docs-mvp/INICIO-RAPIDO.md)** - Guía de 5 minutos ⭐
-- [GUIA-MVP-DOCKER.md](docs-mvp/GUIA-MVP-DOCKER.md) - Documentación completa
-- [ARQUITECTURA-MVP.md](docs-mvp/ARQUITECTURA-MVP.md) - Diagramas del sistema
-- [CASOS-USO-N8N.md](docs-mvp/CASOS-USO-N8N.md) - Automatización con n8n
-- [CHECKLIST-MVP.md](docs-mvp/CHECKLIST-MVP.md) - Verificación paso a paso
+### Guías de Usuario
+- **[INICIO-RAPIDO.md](./docs-mvp/INICIO-RAPIDO.md)** - ⭐ Guía de inicio en 5 minutos
+- **[PRUEBA-END-TO-END.md](./docs-mvp/PRUEBA-END-TO-END.md)** - Guía completa de pruebas E2E del sistema
 
-### Documentación Técnica Detallada
-- [Contexto de Negocio](docs/CONTEXTO_NEGOCIO.md)
-- [Stack Tecnológico](docs/TECH_STACK.md)
-- [Base de Datos](docs/BASE_DATOS.md)
-- [Backend NestJS](docs/BACKEND_NESTJS.md)
-- [Frontend - Arquitectura](frontend/ARCHITECTURE.md) - Guía de arquitectura modular
-- [Estructura del Proyecto](docs/ESTRUCTURA_PROYECTO.md)
+### Documentación Técnica
+- **[ARCHITECTURE.md](./frontend/ARCHITECTURE.md)** - Arquitectura modular del frontend
+- **[INTEGRACION-N8N.md](./backend/INTEGRACION-N8N.md)** - Documentación de integración con n8n
+- **[RESUMEN-FINAL.md](./docs-mvp/RESUMEN-FINAL.md)** - Resumen ejecutivo del proyecto
 
 ## 🏛 Arquitectura del Sistema
 
@@ -316,19 +290,16 @@ frontend/src/
 - Autenticación JWT con guards
 - Prisma ORM para gestión de BD
 - Swagger para documentación automática
+- Endpoints para CRUD de candidatos, empresas, vacantes y postulaciones
 
-### IA Service - Procesamiento con Python
+### n8n - Orquestación de Workflows e IA
 
-- FastAPI para endpoints de análisis
-- Hugging Face Transformers para NLP
-- Análisis de texto y extracción de características
-- Scoring automatizado
-
-### n8n - Orquestación de Workflows
-
-- Evaluación automática al recibir postulación
-- Webhooks para comunicación entre servicios
-- Notificaciones y recordatorios
+- **Evaluación automática** de postulaciones con OpenAI
+- Análisis de CVs y respuestas a preguntas
+- Cálculo de puntaje de compatibilidad (0-100)
+- Generación de feedback inteligente
+- Webhooks para comunicación con backend
+- Actualización automática de postulaciones con resultados IA
 
 ## 🔑 Características Principales
 
@@ -372,7 +343,6 @@ npm run test
 - **Frontend**: Vercel
 - **Backend**: Render / Railway
 - **Base de Datos**: Supabase
-- **AI Service**: Railway / Render
 
 ### CI/CD
 GitHub Actions configurado para:
@@ -398,4 +368,30 @@ Proyecto desarrollado por el equipo de Magnolias Asesorías.
 
 ## 📞 Contacto
 
-Para más información, consulta la documentación en la carpeta `docs/`.
+Para más información, consulta la documentación en la carpeta `docs-mvp/`.
+
+---
+
+## 🚀 Comandos Rápidos
+
+```powershell
+# Iniciar todo el sistema
+.\start-dev.ps1
+
+# Detener todo el sistema
+.\stop-dev.ps1
+
+# Ver logs en tiempo real
+docker-compose -f docker-compose.mvp.yml logs -f
+
+# Ver logs de un servicio específico
+docker-compose -f docker-compose.mvp.yml logs -f backend
+docker-compose -f docker-compose.mvp.yml logs -f frontend
+docker-compose -f docker-compose.mvp.yml logs -f n8n
+
+# Reiniciar un servicio
+docker-compose -f docker-compose.mvp.yml restart backend
+
+# Reconstruir y reiniciar
+docker-compose -f docker-compose.mvp.yml up -d --build
+```

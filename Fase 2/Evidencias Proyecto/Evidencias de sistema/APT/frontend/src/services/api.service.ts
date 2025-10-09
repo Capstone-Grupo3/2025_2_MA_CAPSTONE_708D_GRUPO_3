@@ -3,9 +3,9 @@
  * Maneja todas las peticiones HTTP con autenticación, manejo de errores y logs
  */
 
-import { ApiError } from '@/types';
+import { ApiError } from "@/types";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
 class ApiService {
   private baseUrl: string;
@@ -18,8 +18,8 @@ class ApiService {
    * Obtiene el token de autenticación del localStorage
    */
   private getToken(): string | null {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('token');
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("token");
     }
     return null;
   }
@@ -29,13 +29,13 @@ class ApiService {
    */
   private getHeaders(includeAuth = true): HeadersInit {
     const headers: HeadersInit = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     };
 
     if (includeAuth) {
       const token = this.getToken();
       if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+        headers["Authorization"] = `Bearer ${token}`;
       }
     }
 
@@ -48,7 +48,7 @@ class ApiService {
   private async handleResponse<T>(response: Response): Promise<T> {
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({
-        message: 'Error desconocido',
+        message: "Error desconocido",
         statusCode: response.status,
       }));
 
@@ -59,10 +59,10 @@ class ApiService {
       };
 
       // Si es 401, limpiar token y redirigir a login
-      if (response.status === 401 && typeof window !== 'undefined') {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userType');
-        window.location.href = '/login';
+      if (response.status === 401 && typeof window !== "undefined") {
+        localStorage.removeItem("token");
+        localStorage.removeItem("userType");
+        window.location.href = "/login";
       }
 
       throw apiError;
@@ -77,13 +77,13 @@ class ApiService {
   async get<T>(endpoint: string, includeAuth = true): Promise<T> {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        method: 'GET',
+        method: "GET",
         headers: this.getHeaders(includeAuth),
       });
 
       return this.handleResponse<T>(response);
     } catch (error) {
-      console.error('❌ GET Error:', endpoint, error);
+      console.error("❌ GET Error:", endpoint, error);
       throw error;
     }
   }
@@ -94,14 +94,14 @@ class ApiService {
   async post<T>(endpoint: string, data?: any, includeAuth = true): Promise<T> {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        method: 'POST',
+        method: "POST",
         headers: this.getHeaders(includeAuth),
         body: data ? JSON.stringify(data) : undefined,
       });
 
       return this.handleResponse<T>(response);
     } catch (error) {
-      console.error('❌ POST Error:', endpoint, error);
+      console.error("❌ POST Error:", endpoint, error);
       throw error;
     }
   }
@@ -112,14 +112,14 @@ class ApiService {
   async patch<T>(endpoint: string, data: any, includeAuth = true): Promise<T> {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        method: 'PATCH',
+        method: "PATCH",
         headers: this.getHeaders(includeAuth),
         body: JSON.stringify(data),
       });
 
       return this.handleResponse<T>(response);
     } catch (error) {
-      console.error('❌ PATCH Error:', endpoint, error);
+      console.error("❌ PATCH Error:", endpoint, error);
       throw error;
     }
   }
@@ -130,14 +130,14 @@ class ApiService {
   async put<T>(endpoint: string, data: any, includeAuth = true): Promise<T> {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        method: 'PUT',
+        method: "PUT",
         headers: this.getHeaders(includeAuth),
         body: JSON.stringify(data),
       });
 
       return this.handleResponse<T>(response);
     } catch (error) {
-      console.error('❌ PUT Error:', endpoint, error);
+      console.error("❌ PUT Error:", endpoint, error);
       throw error;
     }
   }
@@ -148,13 +148,13 @@ class ApiService {
   async delete<T>(endpoint: string, includeAuth = true): Promise<T> {
     try {
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        method: 'DELETE',
+        method: "DELETE",
         headers: this.getHeaders(includeAuth),
       });
 
       return this.handleResponse<T>(response);
     } catch (error) {
-      console.error('❌ DELETE Error:', endpoint, error);
+      console.error("❌ DELETE Error:", endpoint, error);
       throw error;
     }
   }
@@ -162,26 +162,30 @@ class ApiService {
   /**
    * POST con FormData (para archivos)
    */
-  async postFormData<T>(endpoint: string, formData: FormData, includeAuth = true): Promise<T> {
+  async postFormData<T>(
+    endpoint: string,
+    formData: FormData,
+    includeAuth = true
+  ): Promise<T> {
     try {
       const headers: HeadersInit = {};
-      
+
       if (includeAuth) {
         const token = this.getToken();
         if (token) {
-          headers['Authorization'] = `Bearer ${token}`;
+          headers["Authorization"] = `Bearer ${token}`;
         }
       }
 
       const response = await fetch(`${this.baseUrl}${endpoint}`, {
-        method: 'POST',
+        method: "POST",
         headers,
         body: formData,
       });
 
       return this.handleResponse<T>(response);
     } catch (error) {
-      console.error('❌ POST FormData Error:', endpoint, error);
+      console.error("❌ POST FormData Error:", endpoint, error);
       throw error;
     }
   }

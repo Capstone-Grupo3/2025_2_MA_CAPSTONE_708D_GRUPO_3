@@ -2,10 +2,14 @@
  * Tipos relacionados con Vacantes
  */
 
-import { Empresa } from './empresa.types';
+import { Empresa } from "./empresa.types";
 
-export type TipoContrato = 'INDEFINIDO' | 'PLAZO_FIJO' | 'HONORARIOS' | 'PART_TIME';
-export type Modalidad = 'PRESENCIAL' | 'REMOTO' | 'HIBRIDO';
+export type TipoContrato =
+  | "INDEFINIDO"
+  | "PLAZO_FIJO"
+  | "HONORARIOS"
+  | "PART_TIME";
+export type Modalidad = "PRESENCIAL" | "REMOTO" | "HIBRIDO";
 
 export interface Vacante {
   id: number;
@@ -38,10 +42,12 @@ export interface VacanteDetalle {
   activa: boolean;
   estado: string;
   preguntasJson?: PreguntaVacante[];
-  empresa: Empresa | {
-    nombre: string;
-    logoUrl?: string;
-  };
+  empresa:
+    | Empresa
+    | {
+        nombre: string;
+        logoUrl?: string;
+      };
   _count?: {
     postulaciones: number;
   };
@@ -49,7 +55,7 @@ export interface VacanteDetalle {
 
 export interface PreguntaVacante {
   pregunta: string;
-  tipo: 'texto' | 'multiple' | 'si_no';
+  tipo: "texto" | "multiple" | "si_no";
   opciones?: string[];
 }
 
