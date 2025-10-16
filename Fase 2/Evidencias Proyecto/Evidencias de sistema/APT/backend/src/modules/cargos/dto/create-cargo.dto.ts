@@ -9,7 +9,7 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 import { TipoContrato, Modalidad } from '@prisma/client';
 
-export class CreateVacanteDto {
+export class CreateCargoDto {
   @ApiProperty({ example: 'Desarrollador Full Stack' })
   @IsString()
   @IsNotEmpty()

@@ -14,7 +14,7 @@ export default function CandidatoLayout({
     const token = localStorage.getItem("token");
     const userType = localStorage.getItem("userType");
 
-    if (!token || userType !== "candidato") {
+    if (!token || userType !== "postulante") {
       router.push("/login");
     }
   }, [router]);

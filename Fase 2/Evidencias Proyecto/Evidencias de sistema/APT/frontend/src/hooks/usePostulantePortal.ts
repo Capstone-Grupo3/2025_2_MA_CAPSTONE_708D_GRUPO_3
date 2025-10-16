@@ -6,22 +6,22 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { candidatoService } from "@/services/candidato.service";
-import { vacanteService } from "@/services/vacante.service";
+import { postulanteService } from "@/services/postulante.service";
+import { cargoService } from "@/services/cargo.service";
 import { postulacionService } from "@/services/postulacion.service";
 import { authService } from "@/services/auth.service";
-import { Candidato, Vacante, Postulacion } from "@/types";
+import { Postulante, Cargo, Postulacion } from "@/types";
 
-export function useCandidatoPortal() {
+export function usePostulantePortal() {
   const router = useRouter();
-  const [candidato, setCandidato] = useState<Candidato | null>(null);
-  const [vacantes, setVacantes] = useState<Vacante[]>([]);
+  const [postulante, setPostulante] = useState<Postulante | null>(null);
+  const [cargos, setCargos] = useState<Cargo[]>([]);
   const [postulaciones, setPostulaciones] = useState<Postulacion[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   /**
-   * Cargar datos del candidato
+   * Cargar datos del postulante
    */
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -37,25 +37,25 @@ export function useCandidatoPortal() {
 
       // Decodificar token para obtener ID
       const payload = JSON.parse(atob(token.split(".")[1]));
-      const candidatoId = payload.sub;
+      const postulanteId = payload.sub;
 
-      console.log("🔍 Cargando datos para candidato ID:", candidatoId);
+      console.log("🔍 Cargando datos para postulante ID:", postulanteId);
 
       // Cargar perfil
       const perfilData =
-        await candidatoService.getCandidatoProfile(candidatoId);
-      console.log("👤 Perfil candidato:", perfilData);
-      setCandidato(perfilData);
+        await postulanteService.getPostulanteProfile(postulanteId);
+      console.log("👤 Perfil postulante:", perfilData);
+      setPostulante(perfilData);
 
-      // Cargar vacantes activas
-      const vacantesData = await vacanteService.getVacantes();
-      console.log("💼 Vacantes disponibles:", vacantesData.length);
-      setVacantes(vacantesData);
+      // Cargar cargos activos
+      const cargosData = await cargoService.getCargos();
+      console.log("💼 Cargos disponibles:", cargosData.length);
+      setCargos(cargosData);
 
-      // Cargar postulaciones del candidato
+      // Cargar postulaciones del postulante
       const postulacionesData =
-        await postulacionService.getPostulacionesByCandidato(candidatoId);
-      console.log("📋 Postulaciones del candidato:", postulacionesData.length);
+        await postulacionService.getPostulacionesByPostulante(postulanteId);
+      console.log("📋 Postulaciones del postulante:", postulacionesData.length);
       setPostulaciones(postulacionesData);
     } catch (err: any) {
       console.error("❌ Error cargando datos:", err);
@@ -92,8 +92,8 @@ export function useCandidatoPortal() {
   }, [loadData]);
 
   return {
-    candidato,
-    vacantes,
+    postulante,
+    cargos,
     postulaciones,
     loading,
     error,

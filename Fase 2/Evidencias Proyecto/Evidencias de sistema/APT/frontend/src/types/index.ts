@@ -2,25 +2,25 @@
  * Punto de entrada centralizado para todos los tipos
  */
 
-// Candidato
+// Postulante
 export type {
-  Candidato,
-  CandidatoDetalle,
-  CandidatoRanking,
-} from "./candidato.types";
+  Postulante,
+  PostulanteDetalle,
+  PostulanteRanking,
+} from "./postulante.types";
 
 // Empresa
 export type { Empresa, EmpresaDetalle } from "./empresa.types";
 
-// Vacante
+// Cargo
 export type {
-  Vacante,
-  VacanteDetalle,
-  PreguntaVacante,
-  CreateVacanteDTO,
+  Cargo,
+  CargoDetalle,
+  PreguntaCargo,
+  CreateCargoDTO,
   TipoContrato,
   Modalidad,
-} from "./vacante.types";
+} from "./cargo.types";
 
 // Postulación
 export type {
@@ -37,7 +37,7 @@ export type {
   LoginCredentials,
   LoginResponse,
   RegisterEmpresaDTO,
-  RegisterCandidatoDTO,
+  RegisterPostulanteDTO,
   AuthUser,
   UserType,
 } from "./auth.types";

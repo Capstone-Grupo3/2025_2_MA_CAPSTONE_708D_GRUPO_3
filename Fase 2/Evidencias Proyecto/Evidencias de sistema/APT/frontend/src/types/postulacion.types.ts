@@ -2,8 +2,8 @@
  * Tipos relacionados con Postulaciones
  */
 
-import { Candidato } from "./candidato.types";
-import { Vacante } from "./vacante.types";
+import { Postulante } from "./postulante.types";
+import { Cargo } from "./cargo.types";
 
 export type EstadoPostulacion =
   | "PENDIENTE"
@@ -19,7 +19,7 @@ export interface Postulacion {
   scoreCompatibilidad?: number;
   puntajeIa?: number;
   feedbackIa?: string;
-  vacante: {
+  cargo: {
     titulo: string;
     empresa: {
       nombre: string;
@@ -36,8 +36,8 @@ export interface PostulacionDetalle {
   feedbackIa?: string;
   respuestasJson?: RespuestaPostulacion[];
   cvUrl?: string;
-  candidato: Candidato;
-  vacante: Vacante & {
+  postulante: Postulante;
+  cargo: Cargo & {
     id: number;
     titulo: string;
   };
@@ -55,8 +55,8 @@ export interface CreatePostulacionDTO {
 }
 
 export interface PostulacionFormData {
-  vacanteId: number;
-  candidatoId: number;
+  cargoId: number;
+  postulanteId: number;
   cvFile?: File;
   cvUrl?: string;
   respuestasJson?: RespuestaPostulacion[];

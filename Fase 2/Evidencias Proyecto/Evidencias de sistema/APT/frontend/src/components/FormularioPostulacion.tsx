@@ -2,21 +2,21 @@
 
 import { useState } from "react";
 import { Upload, File, X, CheckCircle } from "lucide-react";
-import { CreatePostulacionDTO, PreguntaVacante } from "@/types";
+import { CreatePostulacionDTO, PreguntaCargo } from "@/types";
 import { validateCvFile } from "@/lib/validators";
 import { CV_ALLOWED_TYPES, MAX_FILE_SIZE } from "@/lib/constants";
 
 interface FormularioPostulacionProps {
-  vacanteId: number;
-  vacanteTitulo: string;
-  preguntas?: PreguntaVacante[];
+  cargoId: number;
+  cargoTitulo: string;
+  preguntas?: PreguntaCargo[];
   onSubmit: (data: CreatePostulacionDTO) => Promise<void>;
   onCancel: () => void;
 }
 
 export default function FormularioPostulacion({
-  vacanteId,
-  vacanteTitulo,
+  cargoId,
+  cargoTitulo,
   preguntas = [],
   onSubmit,
   onCancel,
@@ -121,9 +121,9 @@ export default function FormularioPostulacion({
       <div className="flex justify-between items-start mb-6">
         <div>
           <h2 className="text-2xl font-bold text-gray-800">
-            Postular a Vacante
+            Postular a Cargo
           </h2>
-          <p className="text-gray-600 mt-1">{vacanteTitulo}</p>
+          <p className="text-gray-600 mt-1">{cargoTitulo}</p>
         </div>
         <button
           onClick={onCancel}

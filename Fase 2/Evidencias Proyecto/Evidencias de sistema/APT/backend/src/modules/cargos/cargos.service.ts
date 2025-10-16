@@ -4,23 +4,24 @@ import {
   ForbiddenException,
 } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { CreateVacanteDto } from './dto/create-vacante.dto';
-import { UpdateVacanteDto } from './dto/update-vacante.dto';
+import { CreateCargoDto } from './dto/create-Cargo.dto';
+import { UpdateCargoDto } from './dto/update-Cargo.dto';
 
 @Injectable()
-export class VacantesService {
+export class CargoService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createVacanteDto: CreateVacanteDto, empresaId: number) {
-    return this.prisma.vacante.create({
+  async create(createCargoDto: CreateCargoDto, empresaId: number) {
+    return this.prisma.cargo.create({
       data: {
-        ...createVacanteDto,
+        ...createCargoDto,
         idEmpresa: empresaId,
       },
       include: {
         empresa: {
           select: {
             id: true,
+            rut: true,
             nombre: true,
             logoUrl: true,
           },
@@ -32,12 +33,13 @@ export class VacantesService {
   async findAll(estado?: string) {
     const where = estado ? { estado: estado as any } : {};
 
-    return this.prisma.vacante.findMany({
+    return this.prisma.cargo.findMany({
       where,
       include: {
         empresa: {
           select: {
             id: true,
+            rut: true,
             nombre: true,
             logoUrl: true,
           },
@@ -50,7 +52,7 @@ export class VacantesService {
   }
 
   async findByEmpresa(empresaId: number) {
-    return this.prisma.vacante.findMany({
+    return this.prisma.cargo.findMany({
       where: { idEmpresa: empresaId },
       include: {
         _count: {
@@ -66,12 +68,13 @@ export class VacantesService {
   }
 
   async findOne(id: number) {
-    const vacante = await this.prisma.vacante.findUnique({
+    const cargo = await this.prisma.cargo.findUnique({
       where: { id },
       include: {
         empresa: {
           select: {
             id: true,
+            rut: true,
             nombre: true,
             descripcion: true,
             logoUrl: true,
@@ -85,33 +88,34 @@ export class VacantesService {
       },
     });
 
-    if (!vacante) {
-      throw new NotFoundException('Vacante no encontrada');
+    if (!cargo) {
+      throw new NotFoundException('Cargo no encontrado');
     }
 
-    return vacante;
+    return cargo;
   }
 
   async update(
     id: number,
-    updateVacanteDto: UpdateVacanteDto,
+    updateCargoDto: UpdateCargoDto,
     empresaId: number,
   ) {
-    const vacante = await this.findOne(id);
+    const cargo = await this.findOne(id);
 
-    if (vacante.idEmpresa !== empresaId) {
+    if (cargo.idEmpresa !== empresaId) {
       throw new ForbiddenException(
-        'No tienes permisos para actualizar esta vacante',
+        'No tienes permisos para actualizar este cargo',
       );
     }
 
-    return this.prisma.vacante.update({
+    return this.prisma.cargo.update({
       where: { id },
-      data: updateVacanteDto,
+      data: updateCargoDto,
       include: {
         empresa: {
           select: {
             id: true,
+            rut: true,
             nombre: true,
             logoUrl: true,
           },
@@ -121,15 +125,15 @@ export class VacantesService {
   }
 
   async remove(id: number, empresaId: number) {
-    const vacante = await this.findOne(id);
+    const cargo = await this.findOne(id);
 
-    if (vacante.idEmpresa !== empresaId) {
+    if (cargo.idEmpresa !== empresaId) {
       throw new ForbiddenException(
-        'No tienes permisos para eliminar esta vacante',
+        'No tienes permisos para eliminar este cargo',
       );
     }
 
-    return this.prisma.vacante.update({
+    return this.prisma.cargo.update({
       where: { id },
       data: { estado: 'CERRADA' },
     });

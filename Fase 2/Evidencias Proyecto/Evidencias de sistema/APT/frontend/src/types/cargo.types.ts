@@ -1,23 +1,26 @@
 /**
- * Tipos relacionados con Vacantes
+ * Tipos relacionados con Cargos/Vacantes
  */
 
 import { Empresa } from "./empresa.types";
 
 export type TipoContrato =
-  | "INDEFINIDO"
-  | "PLAZO_FIJO"
-  | "HONORARIOS"
-  | "PART_TIME";
+  | "FULL_TIME"
+  | "PART_TIME"
+  | "CONTRACTOR"
+  | "TEMPORARY"
+  | "INTERNSHIP";
+
 export type Modalidad = "PRESENCIAL" | "REMOTO" | "HIBRIDO";
 
-export interface Vacante {
+export interface Cargo {
   id: number;
   titulo: string;
   descripcion: string;
   ubicacion: string;
-  salario?: number;
+  salarioEstimado?: number;
   tipoContrato: string;
+  modalidad: string;
   fechaPublicacion: string;
   preguntasJson?: any;
   empresa: {
@@ -26,22 +29,20 @@ export interface Vacante {
   };
 }
 
-export interface VacanteDetalle {
+export interface CargoDetalle {
   id: number;
   titulo: string;
   descripcion: string;
-  ubicacion?: string;
-  salario?: number;
-  salario_min?: number;
-  salario_max?: number;
-  tipoContrato: string;
-  tipo_contrato?: TipoContrato;
-  modalidad?: Modalidad;
+  ubicacion: string;
+  salarioEstimado?: number;
+  tipoContrato: TipoContrato;
+  modalidad: Modalidad;
+  requisitos?: string;
   fechaPublicacion: string;
-  fecha_publicacion?: string;
-  activa: boolean;
+  fechaCierre?: string;
   estado: string;
-  preguntasJson?: PreguntaVacante[];
+  activo: boolean;
+  preguntasJson?: PreguntaCargo[];
   empresa:
     | Empresa
     | {
@@ -51,22 +52,24 @@ export interface VacanteDetalle {
   _count?: {
     postulaciones: number;
   };
+  createdAt?: string;
+  updatedAt?: string;
 }
 
-export interface PreguntaVacante {
+export interface PreguntaCargo {
   pregunta: string;
-  tipo: "texto" | "multiple" | "si_no";
+  tipo?: "texto" | "multiple" | "si_no";
   opciones?: string[];
 }
 
-export interface CreateVacanteDTO {
+export interface CreateCargoDTO {
   titulo: string;
   descripcion: string;
+  tipoContrato: TipoContrato;
   ubicacion: string;
-  salario_min?: number;
-  salario_max?: number;
-  tipo_contrato: TipoContrato;
   modalidad: Modalidad;
+  salarioEstimado?: number;
+  preguntasJson?: PreguntaCargo[];
   requisitos?: string;
-  preguntasJson?: PreguntaVacante[];
+  fechaCierre?: string;
 }

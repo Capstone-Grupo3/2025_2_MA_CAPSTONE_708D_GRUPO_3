@@ -7,8 +7,8 @@ import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
 import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreatePostulacionDto } from './dto/create-postulacion.dto';
-import { IaService } from '../ia/ia.service';
 import { firstValueFrom } from 'rxjs';
+import { IaService } from '../ia/ia.service';
 
 @Injectable()
 export class PostulacionesService {
@@ -33,28 +33,29 @@ export class PostulacionesService {
     // Verificar si ya existe postulación
     const existente = await this.prisma.postulacion.findUnique({
       where: {
-        idCandidato_idVacante: {
-          idCandidato: candidatoId,
-          idVacante: createPostulacionDto.idVacante,
+        idPostulante_idCargo: {
+          idPostulante: candidatoId,
+          idCargo: createPostulacionDto.idVacante,
         },
       },
     });
 
     if (existente) {
-      throw new ConflictException('Ya has postulado a esta vacante');
+      throw new ConflictException('Ya has postulado a este cargo');
     }
 
     // Crear postulación
     const postulacion = await this.prisma.postulacion.create({
       data: {
-        idCandidato: candidatoId,
-        idVacante: createPostulacionDto.idVacante,
+        idPostulante: candidatoId,
+        idCargo: createPostulacionDto.idVacante,
         respuestasJson: createPostulacionDto.respuestasJson,
       },
       include: {
-        candidato: {
+        postulante: {
           select: {
             id: true,
+            rut: true,
             nombre: true,
             correo: true,
             cvUrl: true,
@@ -62,7 +63,7 @@ export class PostulacionesService {
             experienciaAnios: true,
           },
         },
-        vacante: {
+        cargo: {
           select: {
             id: true,
             titulo: true,
@@ -93,8 +94,8 @@ export class PostulacionesService {
     const postulacion = await this.prisma.postulacion.findUnique({
       where: { id: postulacionId },
       include: {
-        candidato: true,
-        vacante: true,
+        postulante: true,
+        cargo: true,
       },
     });
 
@@ -102,11 +103,11 @@ export class PostulacionesService {
 
     try {
       const resultado = await this.iaService.evaluarPostulacion({
-        cv_url: postulacion.candidato.cvUrl || '',
+        cv_url: postulacion.postulante.cvUrl || '',
         respuestas_json: postulacion.respuestasJson,
-        vacante_id: postulacion.idVacante,
-        requisitos: postulacion.vacante.requisitos || '',
-        skills: postulacion.candidato.skillsJson,
+        vacante_id: postulacion.idCargo,
+        requisitos: postulacion.cargo.requisitos || '',
+        skills: postulacion.postulante.skillsJson,
       });
 
       await this.prisma.postulacion.update({
@@ -125,7 +126,7 @@ export class PostulacionesService {
   /**
    * 🚀 NUEVO: Trigger del workflow de n8n para análisis avanzado
    * Este método llama al webhook de n8n que ejecuta el workflow completo:
-   * - Obtiene datos de postulación, vacante y candidato
+   * - Obtiene datos de postulación, cargo y postulante
    * - Descarga y analiza el CV con OpenAI
    * - Compara respuestas del formulario con el CV (detección de discrepancias)
    * - Calcula scores de compatibilidad y veracidad
@@ -174,11 +175,12 @@ export class PostulacionesService {
 
   async findByVacante(vacanteId: number) {
     return this.prisma.postulacion.findMany({
-      where: { idVacante: vacanteId },
+      where: { idCargo: vacanteId },
       include: {
-        candidato: {
+        postulante: {
           select: {
             id: true,
+            rut: true,
             nombre: true,
             correo: true,
             telefono: true,
@@ -195,13 +197,14 @@ export class PostulacionesService {
 
   async findByCandidato(candidatoId: number) {
     return this.prisma.postulacion.findMany({
-      where: { idCandidato: candidatoId },
+      where: { idPostulante: candidatoId },
       include: {
-        vacante: {
+        cargo: {
           include: {
             empresa: {
               select: {
                 id: true,
+                rut: true,
                 nombre: true,
                 logoUrl: true,
               },
@@ -218,14 +221,15 @@ export class PostulacionesService {
   async findByEmpresa(empresaId: number) {
     return this.prisma.postulacion.findMany({
       where: {
-        vacante: {
+        cargo: {
           idEmpresa: empresaId,
         },
       },
       include: {
-        candidato: {
+        postulante: {
           select: {
             id: true,
+            rut: true,
             nombre: true,
             correo: true,
             telefono: true,
@@ -233,7 +237,7 @@ export class PostulacionesService {
             experienciaAnios: true,
           },
         },
-        vacante: {
+        cargo: {
           select: {
             id: true,
             titulo: true,
@@ -248,9 +252,10 @@ export class PostulacionesService {
     const postulacion = await this.prisma.postulacion.findUnique({
       where: { id },
       include: {
-        candidato: {
+        postulante: {
           select: {
             id: true,
+            rut: true,
             nombre: true,
             correo: true,
             telefono: true,
@@ -260,11 +265,12 @@ export class PostulacionesService {
             experienciaAnios: true,
           },
         },
-        vacante: {
+        cargo: {
           include: {
             empresa: {
               select: {
                 id: true,
+                rut: true,
                 nombre: true,
                 logoUrl: true,
               },

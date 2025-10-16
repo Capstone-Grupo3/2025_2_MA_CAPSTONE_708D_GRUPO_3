@@ -4,46 +4,48 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaService } from '../../common/prisma/prisma.service';
-import { CreateCandidatoDto } from './dto/create-candidato.dto';
-import { UpdateCandidatoDto } from './dto/update-candidato.dto';
+import { CreatePostulanteDto } from './dto/create-postulante.dto';
+import { UpdatePostulanteDto } from './dto/update-postulante.dto';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
-export class CandidatosService {
+export class PostulantesService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createCandidatoDto: CreateCandidatoDto) {
-    const existente = await this.prisma.candidato.findUnique({
-      where: { correo: createCandidatoDto.correo },
+  async create(createPostulanteDto: CreatePostulanteDto) {
+    const existente = await this.prisma.postulante.findUnique({
+      where: { correo: createPostulanteDto.correo },
     });
 
     if (existente) {
       throw new ConflictException('El correo ya está registrado');
     }
 
-    const hashedPassword = await bcrypt.hash(createCandidatoDto.contrasena, 10);
+    const hashedPassword = await bcrypt.hash(createPostulanteDto.contrasena, 10);
 
-    const candidato = await this.prisma.candidato.create({
+    const postulante = await this.prisma.postulante.create({
       data: {
-        nombre: createCandidatoDto.nombre,
-        correo: createCandidatoDto.correo,
+        rut: createPostulanteDto.rut,
+        nombre: createPostulanteDto.nombre,
+        correo: createPostulanteDto.correo,
         contrasenaHash: hashedPassword,
-        telefono: createCandidatoDto.telefono,
-        linkedinUrl: createCandidatoDto.linkedinUrl,
-        skillsJson: createCandidatoDto.skillsJson,
-        experienciaAnios: createCandidatoDto.experienciaAnios,
+        telefono: createPostulanteDto.telefono,
+        linkedinUrl: createPostulanteDto.linkedinUrl,
+        skillsJson: createPostulanteDto.skillsJson,
+        experienciaAnios: createPostulanteDto.experienciaAnios,
       },
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { contrasenaHash, ...result } = candidato;
+    const { contrasenaHash, ...result } = postulante;
     return result;
   }
 
   async findAll() {
-    return this.prisma.candidato.findMany({
+    return this.prisma.postulante.findMany({
       select: {
         id: true,
+        rut: true,
         nombre: true,
         correo: true,
         telefono: true,
@@ -58,10 +60,11 @@ export class CandidatosService {
   }
 
   async findOne(id: number) {
-    const candidato = await this.prisma.candidato.findUnique({
+    const postulante = await this.prisma.postulante.findUnique({
       where: { id },
       select: {
         id: true,
+        rut: true,
         nombre: true,
         correo: true,
         telefono: true,
@@ -74,37 +77,38 @@ export class CandidatosService {
       },
     });
 
-    if (!candidato) {
-      throw new NotFoundException('Candidato no encontrado');
+    if (!postulante) {
+      throw new NotFoundException('Postulante no encontrado');
     }
 
-    return candidato;
+    return postulante;
   }
 
   async findByEmail(correo: string) {
-    return this.prisma.candidato.findUnique({
+    return this.prisma.postulante.findUnique({
       where: { correo },
     });
   }
 
-  async update(id: number, updateCandidatoDto: UpdateCandidatoDto) {
+  async update(id: number, updatePostulanteDto: UpdatePostulanteDto) {
     await this.findOne(id);
 
-    const data: any = { ...updateCandidatoDto };
+    const data: any = { ...updatePostulanteDto };
 
-    if (updateCandidatoDto.contrasena) {
+    if (updatePostulanteDto.contrasena) {
       data.contrasenaHash = await bcrypt.hash(
-        updateCandidatoDto.contrasena,
+        updatePostulanteDto.contrasena,
         10,
       );
       delete data.contrasena;
     }
 
-    const candidato = await this.prisma.candidato.update({
+    const postulante = await this.prisma.postulante.update({
       where: { id },
       data,
       select: {
         id: true,
+        rut: true,
         nombre: true,
         correo: true,
         telefono: true,
@@ -117,11 +121,11 @@ export class CandidatosService {
       },
     });
 
-    return candidato;
+    return postulante;
   }
 
   async updateCvUrl(id: number, cvUrl: string) {
-    return this.prisma.candidato.update({
+    return this.prisma.postulante.update({
       where: { id },
       data: { cvUrl },
     });
@@ -130,7 +134,7 @@ export class CandidatosService {
   async remove(id: number) {
     await this.findOne(id);
 
-    return this.prisma.candidato.update({
+    return this.prisma.postulante.update({
       where: { id },
       data: { estado: 'INACTIVO' },
     });

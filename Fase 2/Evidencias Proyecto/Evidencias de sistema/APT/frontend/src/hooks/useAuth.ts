@@ -38,17 +38,17 @@ export function useAuth() {
   );
 
   /**
-   * Login de candidato
+   * Login de postulante
    */
-  const loginCandidato = useCallback(
+  const loginPostulante = useCallback(
     async (credentials: LoginCredentials) => {
       setLoading(true);
       setError(null);
 
       try {
-        const response = await authService.loginCandidato(credentials);
-        authService.saveAuth(response.access_token, "candidato");
-        router.push("/candidato/portal");
+        const response = await authService.loginPostulante(credentials);
+        authService.saveAuth(response.access_token, "postulante");
+        router.push("/postulante/portal");
         return true;
       } catch (err: any) {
         setError(err.message || "Error al iniciar sesión");
@@ -86,7 +86,7 @@ export function useAuth() {
     loading,
     error,
     loginEmpresa,
-    loginCandidato,
+    loginPostulante,
     logout,
     isAuthenticated,
     getUserType,

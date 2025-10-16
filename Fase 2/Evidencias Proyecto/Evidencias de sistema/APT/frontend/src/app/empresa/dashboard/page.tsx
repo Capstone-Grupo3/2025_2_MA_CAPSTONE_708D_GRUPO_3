@@ -37,21 +37,21 @@ export default function DashboardEmpresaPage() {
   // Usar hook personalizado para toda la lógica de datos
   const {
     empresa,
-    vacantes,
+    cargos,
     loading,
     logout,
-    deleteVacante,
-    toggleVacanteStatus,
+    deleteCargo,
+    toggleCargoStatus,
   } = useEmpresaDashboard();
 
   // Estados locales de UI
   const [activeTab, setActiveTab] = useState<
-    "vacantes" | "postulaciones" | "crear" | "perfil"
-  >("vacantes");
+    "cargos" | "postulaciones" | "crear" | "perfil"
+  >("cargos");
   const [postulaciones, setPostulaciones] = useState<PostulacionDetalle[]>([]);
 
-  // Estado para crear vacante
-  const [nuevaVacante, setNuevaVacante] = useState({
+  // Estado para crear cargo
+  const [nuevoCargo, setNuevoCargo] = useState({
     titulo: "",
     descripcion: "",
     ubicacion: "",
@@ -68,23 +68,23 @@ export default function DashboardEmpresaPage() {
     logout();
   };
 
-  const handleDeleteVacante = async (vacanteId: number) => {
-    if (confirm("¿Estás seguro de eliminar esta vacante?")) {
-      const success = await deleteVacante(vacanteId);
+  const handleDeleteCargo = async (cargoId: number) => {
+    if (confirm("¿Estás seguro de eliminar este cargo?")) {
+      const success = await deleteCargo(cargoId);
       if (success) {
-        alert("Vacante eliminada correctamente");
+        alert("Cargo eliminado correctamente");
       }
     }
   };
 
-  const handleToggleVacante = async (vacanteId: number, activa: boolean) => {
-    const success = await toggleVacanteStatus(vacanteId, !activa);
+  const handleToggleCargo = async (cargoId: number, activo: boolean) => {
+    const success = await toggleCargoStatus(cargoId, !activo);
     if (success) {
-      alert(`Vacante ${!activa ? "activada" : "desactivada"} correctamente`);
+      alert(`Cargo ${!activo ? "activado" : "desactivado"} correctamente`);
     }
   };
 
-  const fetchPostulacionesByVacante = async (vacanteId: number) => {
+  const fetchPostulacionesByCargo = async (cargoId: number) => {
     try {
       const token = localStorage.getItem("token");
       const headers = {
@@ -93,7 +93,7 @@ export default function DashboardEmpresaPage() {
       };
 
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/postulaciones/vacante/${vacanteId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/postulaciones/cargo/${cargoId}`,
         {
           headers,
         }
@@ -109,13 +109,13 @@ export default function DashboardEmpresaPage() {
     }
   };
 
-  const handleCrearVacante = async (e: React.FormEvent) => {
+  const handleCrearCargo = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/vacantes`,
+        `${process.env.NEXT_PUBLIC_API_URL}/cargos`,
         {
           method: "POST",
           headers: {
@@ -123,20 +123,20 @@ export default function DashboardEmpresaPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            titulo: nuevaVacante.titulo,
-            descripcion: nuevaVacante.descripcion,
-            ubicacion: nuevaVacante.ubicacion,
-            salarioEstimado: nuevaVacante.salario
-              ? parseFloat(nuevaVacante.salario)
+            titulo: nuevoCargo.titulo,
+            descripcion: nuevoCargo.descripcion,
+            ubicacion: nuevoCargo.ubicacion,
+            salarioEstimado: nuevoCargo.salario
+              ? parseFloat(nuevoCargo.salario)
               : undefined,
-            tipoContrato: nuevaVacante.tipoContrato,
-            modalidad: nuevaVacante.modalidad,
-            requisitos: nuevaVacante.requisitos,
+            tipoContrato: nuevoCargo.tipoContrato,
+            modalidad: nuevoCargo.modalidad,
+            requisitos: nuevoCargo.requisitos,
             preguntasJson: {
               preguntas: [
-                nuevaVacante.pregunta1,
-                nuevaVacante.pregunta2,
-                nuevaVacante.pregunta3,
+                nuevoCargo.pregunta1,
+                nuevoCargo.pregunta2,
+                nuevoCargo.pregunta3,
               ].filter((p) => p.trim() !== ""),
             },
           }),
@@ -144,8 +144,8 @@ export default function DashboardEmpresaPage() {
       );
 
       if (response.ok) {
-        alert("¡Vacante creada exitosamente!");
-        setNuevaVacante({
+        alert("¡Cargo creado exitosamente!");
+        setNuevoCargo({
           titulo: "",
           descripcion: "",
           ubicacion: "",
@@ -157,24 +157,24 @@ export default function DashboardEmpresaPage() {
           pregunta2: "",
           pregunta3: "",
         });
-        setActiveTab("vacantes");
+        setActiveTab("cargos");
         window.location.reload();
       } else {
-        alert("Error al crear la vacante");
+        alert("Error al crear el cargo");
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error al crear la vacante");
+      alert("Error al crear el cargo");
     }
   };
 
-  const handleEliminarVacante = async (vacanteId: number) => {
-    if (!confirm("¿Estás seguro de eliminar esta vacante?")) return;
+  const handleEliminarCargo = async (cargoId: number) => {
+    if (!confirm("¿Estás seguro de eliminar este cargo?")) return;
 
     try {
       const token = localStorage.getItem("token");
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/vacantes/${vacanteId}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/cargos/${cargoId}`,
         {
           method: "DELETE",
           headers: {
@@ -184,14 +184,14 @@ export default function DashboardEmpresaPage() {
       );
 
       if (response.ok) {
-        alert("Vacante eliminada");
+        alert("Cargo eliminado");
         window.location.reload();
       } else {
-        alert("Error al eliminar la vacante");
+        alert("Error al eliminar el cargo");
       }
     } catch (error) {
       console.error("Error:", error);
-      alert("Error al eliminar la vacante");
+      alert("Error al eliminar el cargo");
     }
   };
 
@@ -216,8 +216,8 @@ export default function DashboardEmpresaPage() {
       if (response.ok) {
         alert(`Postulación ${nuevoEstado.toLowerCase()}`);
         // Recargar postulaciones
-        if (postulaciones.length > 0 && postulaciones[0].vacante?.id) {
-          fetchPostulacionesByVacante(postulaciones[0].vacante.id);
+        if (postulaciones.length > 0 && postulaciones[0].cargo?.id) {
+          fetchPostulacionesByCargo(postulaciones[0].cargo.id);
         }
       } else {
         alert("Error al actualizar la postulación");
@@ -245,28 +245,28 @@ export default function DashboardEmpresaPage() {
   const postulacionesAprobadas = postulaciones.filter(
     (p) => p.estado === "SELECCIONADO"
   ).length;
-  const vacantesActivas = vacantes.filter((v) => v.activa).length;
+  const cargosActivos = cargos.filter((c) => c.activo).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
+              <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2.5 rounded-xl shadow-lg">
                 <Building2 className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-800">
+                <h1 className="text-xl font-bold text-slate-900">
                   Portal de Empresa
                 </h1>
-                <p className="text-sm text-gray-600">{empresa?.nombre}</p>
+                <p className="text-sm text-slate-600">{empresa?.nombre}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+              className="flex items-center gap-2 px-4 py-2 text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg transition-all shadow-sm"
             >
               <LogOut size={20} />
               Cerrar Sesión
@@ -276,62 +276,70 @@ export default function DashboardEmpresaPage() {
       </header>
 
       {/* Stats Cards */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-slate-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-blue-50 rounded-xl p-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-5">
+            <div className="bg-gradient-to-br from-orange-50 to-orange-100 rounded-2xl p-5 border border-orange-200 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-blue-600 font-medium">
-                    Vacantes Activas
+                  <p className="text-sm font-semibold text-orange-700 mb-1">
+                    Cargos Activos
                   </p>
-                  <p className="text-3xl font-bold text-blue-700 mt-1">
-                    {vacantesActivas}
+                  <p className="text-4xl font-bold text-orange-900">
+                    {cargosActivos}
                   </p>
                 </div>
-                <Briefcase className="w-10 h-10 text-blue-600 opacity-50" />
+                <div className="bg-white/70 p-3 rounded-xl">
+                  <Briefcase className="w-8 h-8 text-orange-600" />
+                </div>
               </div>
             </div>
 
-            <div className="bg-yellow-50 rounded-xl p-4">
+            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-2xl p-5 border border-yellow-200 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-yellow-600 font-medium">
+                  <p className="text-sm font-semibold text-yellow-700 mb-1">
                     Pendientes
                   </p>
-                  <p className="text-3xl font-bold text-yellow-700 mt-1">
+                  <p className="text-4xl font-bold text-yellow-900">
                     {postulacionesPendientes}
                   </p>
                 </div>
-                <Clock className="w-10 h-10 text-yellow-600 opacity-50" />
+                <div className="bg-white/70 p-3 rounded-xl">
+                  <Clock className="w-8 h-8 text-yellow-600" />
+                </div>
               </div>
             </div>
 
-            <div className="bg-green-50 rounded-xl p-4">
+            <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-5 border border-green-200 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-green-600 font-medium">
+                  <p className="text-sm font-semibold text-green-700 mb-1">
                     Aprobadas
                   </p>
-                  <p className="text-3xl font-bold text-green-700 mt-1">
+                  <p className="text-4xl font-bold text-green-900">
                     {postulacionesAprobadas}
                   </p>
                 </div>
-                <CheckCircle className="w-10 h-10 text-green-600 opacity-50" />
+                <div className="bg-white/70 p-3 rounded-xl">
+                  <CheckCircle className="w-8 h-8 text-green-600" />
+                </div>
               </div>
             </div>
 
-            <div className="bg-purple-50 rounded-xl p-4">
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-5 border border-blue-200 shadow-sm hover:shadow-md transition-all">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-purple-600 font-medium">
+                  <p className="text-sm font-semibold text-blue-700 mb-1">
                     Total Postulaciones
                   </p>
-                  <p className="text-3xl font-bold text-purple-700 mt-1">
+                  <p className="text-4xl font-bold text-blue-900">
                     {postulaciones.length}
                   </p>
                 </div>
-                <Users className="w-10 h-10 text-purple-600 opacity-50" />
+                <div className="bg-white/70 p-3 rounded-xl">
+                  <Users className="w-8 h-8 text-blue-600" />
+                </div>
               </div>
             </div>
           </div>
@@ -339,28 +347,28 @@ export default function DashboardEmpresaPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex gap-8">
             <button
-              onClick={() => setActiveTab("vacantes")}
-              className={`py-4 px-2 border-b-2 font-medium transition-all ${
-                activeTab === "vacantes"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-600 hover:text-gray-800"
+              onClick={() => setActiveTab("cargos")}
+              className={`py-4 px-2 border-b-2 font-semibold transition-all ${
+                activeTab === "cargos"
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
               }`}
             >
               <div className="flex items-center gap-2">
                 <Briefcase size={20} />
-                Mis Vacantes ({vacantes.length})
+                Mis Cargos ({cargos.length})
               </div>
             </button>
             <button
               onClick={() => setActiveTab("postulaciones")}
-              className={`py-4 px-2 border-b-2 font-medium transition-all ${
+              className={`py-4 px-2 border-b-2 font-semibold transition-all ${
                 activeTab === "postulaciones"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-600 hover:text-gray-800"
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -370,23 +378,23 @@ export default function DashboardEmpresaPage() {
             </button>
             <button
               onClick={() => setActiveTab("crear")}
-              className={`py-4 px-2 border-b-2 font-medium transition-all ${
+              className={`py-4 px-2 border-b-2 font-semibold transition-all ${
                 activeTab === "crear"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-600 hover:text-gray-800"
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
               }`}
             >
               <div className="flex items-center gap-2">
                 <Plus size={20} />
-                Crear Vacante
+                Crear Cargo
               </div>
             </button>
             <button
               onClick={() => setActiveTab("perfil")}
-              className={`py-4 px-2 border-b-2 font-medium transition-all ${
+              className={`py-4 px-2 border-b-2 font-semibold transition-all ${
                 activeTab === "perfil"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-600 hover:text-gray-800"
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -400,74 +408,74 @@ export default function DashboardEmpresaPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Mis Vacantes Tab */}
-        {activeTab === "vacantes" && (
+        {/* Mis Cargos Tab */}
+        {activeTab === "cargos" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold text-gray-800">
-                Mis Vacantes ({vacantes.length})
+                Mis Cargos ({cargos.length})
               </h2>
               <button
                 onClick={() => setActiveTab("crear")}
                 className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
               >
                 <Plus size={20} />
-                Nueva Vacante
+                Nuevo Cargo
               </button>
             </div>
 
             <div className="space-y-4">
-              {vacantes.map((vacante) => (
+              {cargos.map((cargo) => (
                 <div
-                  key={vacante.id}
+                  key={cargo.id}
                   className="bg-white rounded-xl shadow-sm border p-6 hover:shadow-md transition-all"
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-xl font-bold text-gray-800">
-                          {vacante.titulo}
+                          {cargo.titulo}
                         </h3>
                         <span
                           className={`px-3 py-1 rounded-full text-xs font-medium ${
-                            vacante.activa
+                            cargo.activo
                               ? "bg-green-100 text-green-800"
                               : "bg-gray-100 text-gray-800"
                           }`}
                         >
-                          {vacante.activa ? "Activa" : "Inactiva"}
+                          {cargo.activo ? "Activo" : "Inactivo"}
                         </span>
                       </div>
 
                       <p className="text-gray-600 mb-4 line-clamp-2">
-                        {vacante.descripcion}
+                        {cargo.descripcion}
                       </p>
 
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600">
                         <div className="flex items-center gap-1">
                           <MapPin size={16} />
-                          {vacante.ubicacion}
+                          {cargo.ubicacion}
                         </div>
-                        {vacante.salario && (
+                        {cargo.salarioEstimado && (
                           <div className="flex items-center gap-1">
                             <DollarSign size={16} />$
-                            {vacante.salario.toLocaleString()} CLP
+                            {cargo.salarioEstimado.toLocaleString()} CLP
                           </div>
                         )}
                         <div className="flex items-center gap-1">
                           <Clock size={16} />
-                          {vacante.tipoContrato}
+                          {cargo.tipoContrato}
                         </div>
                         <div className="flex items-center gap-1">
                           <Users size={16} />
-                          {vacante._count?.postulaciones || 0} postulaciones
+                          {cargo._count?.postulaciones || 0} postulaciones
                         </div>
                       </div>
                     </div>
 
                     <div className="flex gap-2 ml-4">
                       <button
-                        onClick={() => handleEliminarVacante(vacante.id)}
+                        onClick={() => handleDeleteCargo(cargo.id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
                         title="Eliminar"
                       >
@@ -478,20 +486,20 @@ export default function DashboardEmpresaPage() {
                 </div>
               ))}
 
-              {vacantes.length === 0 && (
+              {cargos.length === 0 && (
                 <div className="text-center py-12">
                   <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-800 mb-2">
-                    No tienes vacantes publicadas
+                    No tienes cargos publicados
                   </h3>
                   <p className="text-gray-600 mb-4">
-                    Crea tu primera vacante para empezar a recibir postulaciones
+                    Crea tu primer cargo para empezar a recibir postulaciones
                   </p>
                   <button
                     onClick={() => setActiveTab("crear")}
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                   >
-                    Crear Vacante
+                    Crear Cargo
                   </button>
                 </div>
               )}
@@ -516,42 +524,42 @@ export default function DashboardEmpresaPage() {
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
                         <h3 className="text-xl font-bold text-gray-800">
-                          {postulacion.candidato.nombre}
+                          {postulacion.postulante?.nombre || "Postulante"}
                         </h3>
-                        {postulacion.scoreCompatibilidad && (
+                        {postulacion.puntajeIa && (
                           <div className="flex items-center gap-1 px-3 py-1 bg-blue-50 rounded-full">
                             <TrendingUp size={16} className="text-blue-600" />
                             <span className="text-sm font-bold text-blue-600">
-                              {postulacion.scoreCompatibilidad}% match
+                              {postulacion.puntajeIa}% match
                             </span>
                           </div>
                         )}
                       </div>
 
                       <p className="text-gray-600 mb-3">
-                        Vacante:{" "}
+                        Cargo:{" "}
                         <span className="font-medium">
-                          {postulacion.vacante.titulo}
+                          {postulacion.cargo.titulo}
                         </span>
                       </p>
 
                       <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-4">
-                        <div>{postulacion.candidato.correo}</div>
-                        {postulacion.candidato.telefono && (
-                          <div>{postulacion.candidato.telefono}</div>
+                        <div>{postulacion.postulante?.correo}</div>
+                        {postulacion.postulante?.telefono && (
+                          <div>{postulacion.postulante.telefono}</div>
                         )}
-                        {postulacion.candidato.experienciaAnios !==
+                        {postulacion.postulante?.experienciaAnios !==
                           undefined && (
                           <div>
-                            {postulacion.candidato.experienciaAnios} años de
+                            {postulacion.postulante.experienciaAnios} años de
                             experiencia
                           </div>
                         )}
                       </div>
 
-                      {postulacion.candidato.linkedinUrl && (
+                      {postulacion.postulante?.linkedinUrl && (
                         <a
-                          href={postulacion.candidato.linkedinUrl}
+                          href={postulacion.postulante.linkedinUrl}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:underline text-sm"
@@ -609,7 +617,7 @@ export default function DashboardEmpresaPage() {
                   </h3>
                   <p className="text-gray-600">
                     Las postulaciones aparecerán aquí cuando los candidatos
-                    apliquen a tus vacantes
+                    apliquen a tus cargos
                   </p>
                 </div>
               )}
@@ -617,27 +625,27 @@ export default function DashboardEmpresaPage() {
           </div>
         )}
 
-        {/* Crear Vacante Tab */}
+        {/* Crear Cargo Tab */}
         {activeTab === "crear" && (
           <div className="max-w-3xl">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">
-              Crear Nueva Vacante
+              Crear Nuevo Cargo
             </h2>
 
             <form
-              onSubmit={handleCrearVacante}
+              onSubmit={handleCrearCargo}
               className="bg-white rounded-xl shadow-sm border p-6 space-y-6"
             >
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Título de la Vacante *
+                  Título del Cargo *
                 </label>
                 <input
                   type="text"
                   required
-                  value={nuevaVacante.titulo}
+                  value={nuevoCargo.titulo}
                   onChange={(e) =>
-                    setNuevaVacante({ ...nuevaVacante, titulo: e.target.value })
+                    setNuevoCargo({ ...nuevoCargo, titulo: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Ej: Desarrollador Full Stack"
@@ -651,10 +659,10 @@ export default function DashboardEmpresaPage() {
                 <textarea
                   rows={6}
                   required
-                  value={nuevaVacante.descripcion}
+                  value={nuevoCargo.descripcion}
                   onChange={(e) =>
-                    setNuevaVacante({
-                      ...nuevaVacante,
+                    setNuevoCargo({
+                      ...nuevoCargo,
                       descripcion: e.target.value,
                     })
                   }
@@ -671,10 +679,10 @@ export default function DashboardEmpresaPage() {
                   <input
                     type="text"
                     required
-                    value={nuevaVacante.ubicacion}
+                    value={nuevoCargo.ubicacion}
                     onChange={(e) =>
-                      setNuevaVacante({
-                        ...nuevaVacante,
+                      setNuevoCargo({
+                        ...nuevoCargo,
                         ubicacion: e.target.value,
                       })
                     }
@@ -689,10 +697,10 @@ export default function DashboardEmpresaPage() {
                   </label>
                   <input
                     type="number"
-                    value={nuevaVacante.salario}
+                    value={nuevoCargo.salario}
                     onChange={(e) =>
-                      setNuevaVacante({
-                        ...nuevaVacante,
+                      setNuevoCargo({
+                        ...nuevoCargo,
                         salario: e.target.value,
                       })
                     }
@@ -709,10 +717,10 @@ export default function DashboardEmpresaPage() {
                   </label>
                   <select
                     required
-                    value={nuevaVacante.tipoContrato}
+                    value={nuevoCargo.tipoContrato}
                     onChange={(e) =>
-                      setNuevaVacante({
-                        ...nuevaVacante,
+                      setNuevoCargo({
+                        ...nuevoCargo,
                         tipoContrato: e.target.value,
                       })
                     }
@@ -732,10 +740,10 @@ export default function DashboardEmpresaPage() {
                   </label>
                   <select
                     required
-                    value={nuevaVacante.modalidad}
+                    value={nuevoCargo.modalidad}
                     onChange={(e) =>
-                      setNuevaVacante({
-                        ...nuevaVacante,
+                      setNuevoCargo({
+                        ...nuevoCargo,
                         modalidad: e.target.value,
                       })
                     }
@@ -754,10 +762,10 @@ export default function DashboardEmpresaPage() {
                 </label>
                 <textarea
                   rows={4}
-                  value={nuevaVacante.requisitos}
+                  value={nuevoCargo.requisitos}
                   onChange={(e) =>
-                    setNuevaVacante({
-                      ...nuevaVacante,
+                    setNuevoCargo({
+                      ...nuevoCargo,
                       requisitos: e.target.value,
                     })
                   }
@@ -779,10 +787,10 @@ export default function DashboardEmpresaPage() {
                     <input
                       type="text"
                       required
-                      value={nuevaVacante.pregunta1}
+                      value={nuevoCargo.pregunta1}
                       onChange={(e) =>
-                        setNuevaVacante({
-                          ...nuevaVacante,
+                        setNuevoCargo({
+                          ...nuevoCargo,
                           pregunta1: e.target.value,
                         })
                       }
@@ -797,10 +805,10 @@ export default function DashboardEmpresaPage() {
                     <input
                       type="text"
                       required
-                      value={nuevaVacante.pregunta2}
+                      value={nuevoCargo.pregunta2}
                       onChange={(e) =>
-                        setNuevaVacante({
-                          ...nuevaVacante,
+                        setNuevoCargo({
+                          ...nuevoCargo,
                           pregunta2: e.target.value,
                         })
                       }
@@ -815,10 +823,10 @@ export default function DashboardEmpresaPage() {
                     <input
                       type="text"
                       required
-                      value={nuevaVacante.pregunta3}
+                      value={nuevoCargo.pregunta3}
                       onChange={(e) =>
-                        setNuevaVacante({
-                          ...nuevaVacante,
+                        setNuevoCargo({
+                          ...nuevoCargo,
                           pregunta3: e.target.value,
                         })
                       }
@@ -834,11 +842,11 @@ export default function DashboardEmpresaPage() {
                   type="submit"
                   className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-all"
                 >
-                  Publicar Vacante
+                  Publicar Cargo
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActiveTab("vacantes")}
+                  onClick={() => setActiveTab("cargos")}
                   className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-all"
                 >
                   Cancelar
@@ -879,15 +887,15 @@ export default function DashboardEmpresaPage() {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="text-center p-4 bg-blue-50 rounded-lg">
                     <div className="text-3xl font-bold text-blue-600">
-                      {vacantes.length}
+                      {cargos.length}
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">Vacantes</div>
+                    <div className="text-sm text-gray-600 mt-1">Cargos</div>
                   </div>
                   <div className="text-center p-4 bg-green-50 rounded-lg">
                     <div className="text-3xl font-bold text-green-600">
-                      {vacantesActivas}
+                      {cargosActivos}
                     </div>
-                    <div className="text-sm text-gray-600 mt-1">Activas</div>
+                    <div className="text-sm text-gray-600 mt-1">Activos</div>
                   </div>
                   <div className="text-center p-4 bg-yellow-50 rounded-lg">
                     <div className="text-3xl font-bold text-yellow-600">

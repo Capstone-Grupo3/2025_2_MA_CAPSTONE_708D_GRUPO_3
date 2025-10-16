@@ -1,15 +1,15 @@
 import { Trophy, Medal, Award, User } from "lucide-react";
-import { CandidatoRanking } from "@/types";
+import { PostulanteRanking } from "@/types";
 import { getPuntajeColor, formatDateShort } from "@/lib/formatters";
 
 interface RankingTableProps {
-  candidatos: CandidatoRanking[];
-  onSelectCandidato?: (candidato: CandidatoRanking) => void;
+  postulantes: PostulanteRanking[];
+  onSelectPostulante?: (Postulante: PostulanteRanking) => void;
 }
 
 export default function RankingTable({
-  candidatos,
-  onSelectCandidato,
+  postulantes,
+  onSelectPostulante,
 }: RankingTableProps) {
   const getMedalIcon = (position: number) => {
     if (position === 1) return <Trophy className="w-6 h-6 text-yellow-500" />;
@@ -22,7 +22,7 @@ export default function RankingTable({
     );
   };
 
-  if (candidatos.length === 0) {
+  if (postulantes.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
         <User className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -30,7 +30,7 @@ export default function RankingTable({
           No hay postulaciones aún
         </h3>
         <p className="text-gray-500">
-          Cuando los candidatos postulen, aparecerán aquí con su ranking de IA.
+          Cuando los postulantes postulen, aparecerán aquí con su ranking de IA.
         </p>
       </div>
     );
@@ -40,9 +40,9 @@ export default function RankingTable({
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
-        <h2 className="text-xl font-bold text-white">Ranking de Candidatos</h2>
+        <h2 className="text-xl font-bold text-white">Ranking de postulantes</h2>
         <p className="text-blue-100 text-sm mt-1">
-          Evaluación automática por IA • {candidatos.length} postulaciones
+          Evaluación automática por IA • {postulantes.length} postulaciones
         </p>
       </div>
 
@@ -55,7 +55,7 @@ export default function RankingTable({
                 Posición
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Candidato
+                Postulante
               </th>
               <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                 Puntaje IA
@@ -69,11 +69,11 @@ export default function RankingTable({
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
-            {candidatos.map((candidato, index) => (
+            {postulantes.map((Postulante, index) => (
               <tr
-                key={candidato.id}
+                key={Postulante.id}
                 className="hover:bg-gray-50 transition-colors cursor-pointer"
-                onClick={() => onSelectCandidato?.(candidato)}
+                onClick={() => onSelectPostulante?.(Postulante)}
               >
                 {/* Posición */}
                 <td className="px-6 py-4 whitespace-nowrap">
@@ -82,13 +82,13 @@ export default function RankingTable({
                   </div>
                 </td>
 
-                {/* Candidato */}
+                {/* Postulante */}
                 <td className="px-6 py-4">
                   <div>
                     <p className="text-sm font-semibold text-gray-800">
-                      {candidato.nombre_completo}
+                      {Postulante.nombre_completo}
                     </p>
-                    <p className="text-xs text-gray-500">{candidato.email}</p>
+                    <p className="text-xs text-gray-500">{Postulante.email}</p>
                   </div>
                 </td>
 
@@ -97,17 +97,17 @@ export default function RankingTable({
                   <div className="flex items-center gap-2">
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-bold ${getPuntajeColor(
-                        candidato.puntajeIa
+                        Postulante.puntajeIa
                       )}`}
                     >
-                      {candidato.puntajeIa.toFixed(1)} / 100
+                      {Postulante.puntajeIa.toFixed(1)} / 100
                     </span>
                   </div>
                 </td>
 
                 {/* Fecha */}
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {formatDateShort(candidato.fecha_postulacion)}
+                  {formatDateShort(Postulante.fecha_postulacion)}
                 </td>
 
                 {/* Acciones */}
@@ -115,7 +115,7 @@ export default function RankingTable({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      onSelectCandidato?.(candidato);
+                      onSelectPostulante?.(Postulante);
                     }}
                     className="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors"
                   >

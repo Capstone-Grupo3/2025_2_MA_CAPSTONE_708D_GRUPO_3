@@ -23,8 +23,8 @@ async function bootstrap() {
 
   // Swagger documentation
   const config = new DocumentBuilder()
-    .setTitle('APT API')
-    .setDescription('API REST para el portal de empleo APT')
+    .setTitle('Magnolias API')
+    .setDescription('API REST para el portal de empleo Magnolias')
     .setVersion('1.0')
     .addBearerAuth()
     .build();
