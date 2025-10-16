@@ -6,7 +6,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { EmpresasModule } from '../empresas/empresas.module';
-import { CandidatosModule } from '../candidatos/candidatos.module';
+import { PostulantesModule } from '../postulantes/postulantes.module';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { CandidatosModule } from '../candidatos/candidatos.module';
       inject: [ConfigService],
     }),
     EmpresasModule,
-    CandidatosModule,
+    PostulantesModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

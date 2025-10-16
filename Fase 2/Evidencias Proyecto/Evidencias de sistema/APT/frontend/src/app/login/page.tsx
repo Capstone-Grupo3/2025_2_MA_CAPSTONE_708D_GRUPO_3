@@ -1,20 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { Briefcase, Eye, EyeOff } from "lucide-react";
-import { UserType } from "@/types";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
+import { Briefcase, Eye, EyeOff, User, Building2, Mail, Lock, CheckCircle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { validateEmail, validatePassword } from "@/lib/validators";
 
 export default function LoginPage() {
-  const { loginEmpresa, loginCandidato, loading, error: authError } = useAuth();
+  const searchParams = useSearchParams();
+  const { loginEmpresa, loginPostulante, loading, error: authError } = useAuth();
 
-  const [tipoUsuario, setTipoUsuario] = useState<UserType>("candidato");
+  const [tipoUsuario, setTipoUsuario] = useState<"empresa" | "postulante">("postulante");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+
+  // Mostrar mensaje de éxito si viene del registro
+  useEffect(() => {
+    if (searchParams?.get("registered") === "true") {
+      setShowSuccessMessage(true);
+      setTimeout(() => setShowSuccessMessage(false), 5000);
+    }
+  }, [searchParams]);
+
+  // Cargar email guardado si existe
+  useEffect(() => {
+    const savedEmail = localStorage.getItem("rememberedEmail");
+    if (savedEmail) {
+      setEmail(savedEmail);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,124 +50,281 @@ export default function LoginPage() {
       return;
     }
 
+    // Guardar email si "Recordarme" está activado
+    if (rememberMe) {
+      localStorage.setItem("rememberedEmail", email);
+    } else {
+      localStorage.removeItem("rememberedEmail");
+    }
+
     const credentials = { correo: email, contrasena: password };
 
     if (tipoUsuario === "empresa") {
       await loginEmpresa(credentials);
     } else {
-      await loginCandidato(credentials);
+      await loginPostulante(credentials);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="bg-blue-600 p-3 rounded-full">
-              <Briefcase className="w-8 h-8 text-white" />
+    <div className="min-h-screen bg-white flex">
+      {/* Left Side - Branding */}
+      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 p-12 flex-col justify-between">
+        <div>
+          <Link href="/" className="flex items-center space-x-3 mb-12">
+            <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2 rounded-lg">
+              <Briefcase className="h-6 w-6 text-white" />
+            </div>
+            <span className="text-2xl font-bold text-white">APT</span>
+          </Link>
+          
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Bienvenido de vuelta
+          </h2>
+          <p className="text-xl text-blue-200 mb-12">
+            Accede a tu cuenta y continúa gestionando tu proceso de reclutamiento con inteligencia artificial.
+          </p>
+
+          <div className="space-y-6">
+            <div className="flex items-start gap-4">
+              <div className="bg-orange-500/20 rounded-lg p-3">
+                <CheckCircle className="w-6 h-6 text-orange-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Análisis Inteligente</h3>
+                <p className="text-blue-200 text-sm">IA que evalúa automáticamente cada candidato</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="bg-orange-500/20 rounded-lg p-3">
+                <CheckCircle className="w-6 h-6 text-orange-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Ranking Automático</h3>
+                <p className="text-blue-200 text-sm">Los mejores candidatos aparecen primero</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="bg-orange-500/20 rounded-lg p-3">
+                <CheckCircle className="w-6 h-6 text-orange-400" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold mb-1">Gestión Centralizada</h3>
+                <p className="text-blue-200 text-sm">Todo tu proceso en un solo lugar</p>
+              </div>
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-gray-800">Iniciar Sesión</h1>
-          <p className="text-gray-600 mt-2">Accede a tu cuenta APT</p>
         </div>
+        
+        <p className="text-blue-300 text-sm">
+          © 2025 APT. Todos los derechos reservados.
+        </p>
+      </div>
 
-        <div className="flex gap-2 mb-6 bg-gray-100 p-1 rounded-lg">
-          <button
-            type="button"
-            onClick={() => setTipoUsuario("candidato")}
-            className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
-              tipoUsuario === "candidato"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-800"
-            }`}
-          >
-            Candidato
-          </button>
-          <button
-            type="button"
-            onClick={() => setTipoUsuario("empresa")}
-            className={`flex-1 py-2 px-4 rounded-md font-medium transition-all ${
-              tipoUsuario === "empresa"
-                ? "bg-white text-blue-600 shadow-sm"
-                : "text-gray-600 hover:text-gray-800"
-            }`}
-          >
-            Empresa
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {(error || authError) && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-              {error || authError}
+      {/* Right Side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
+        <div className="w-full max-w-md">
+          {/* Mensaje de éxito */}
+          {showSuccessMessage && (
+            <div className="mb-6 bg-green-50 border-2 border-green-200 text-green-800 px-4 py-3 rounded-xl flex items-center gap-3 shadow-sm">
+              <CheckCircle className="w-5 h-5 flex-shrink-0" />
+              <span className="font-medium">
+                ¡Registro exitoso! Ahora puedes iniciar sesión
+              </span>
             </div>
           )}
 
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              placeholder="tu@email.com"
-            />
-          </div>
+            {/* Header Mobile */}
+            <div className="lg:hidden text-center mb-8">
+              <Link href="/" className="inline-flex items-center space-x-3 mb-6">
+                <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2 rounded-lg">
+                  <Briefcase className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-2xl font-bold text-slate-900">APT</span>
+              </Link>
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                Iniciar Sesión
+              </h1>
+              <p className="text-slate-600">
+                Accede a tu cuenta APT
+              </p>
+            </div>
 
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
-              Contraseña
-            </label>
-            <div className="relative">
-              <input
-                id="password"
-                type={showPassword ? "text" : "password"}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                placeholder="••••••••"
-              />
+            <div className="hidden lg:block mb-8">
+              <h1 className="text-3xl font-bold text-slate-900 mb-2">
+                Iniciar Sesión
+              </h1>
+              <p className="text-slate-600">
+                Ingresa tus credenciales para continuar
+              </p>
+            </div>
+
+            {/* Selector de tipo de usuario */}
+            <div className="flex gap-3 mb-6 bg-slate-50 p-1.5 rounded-lg border border-slate-200">
               <button
                 type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                onClick={() => setTipoUsuario("postulante")}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+                  tipoUsuario === "postulante"
+                    ? "bg-white text-orange-600 shadow-sm border border-orange-100"
+                    : "text-slate-600 hover:text-slate-800"
+                }`}
               >
-                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                <User size={20} />
+                <span>Postulante</span>
               </button>
+              <button
+                type="button"
+                onClick={() => setTipoUsuario("empresa")}
+                className={`flex-1 py-3 px-4 rounded-lg font-medium transition-all flex items-center justify-center gap-2 ${
+                  tipoUsuario === "empresa"
+                    ? "bg-white text-orange-600 shadow-sm border border-orange-100"
+                    : "text-slate-600 hover:text-slate-800"
+                }`}
+              >
+              <Building2 size={20} />
+              <span>Empresa</span>
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Mensaje de error */}
+            {(error || authError) && (
+              <div className="bg-red-50 border-2 border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm flex items-start gap-2">
+                <span className="text-red-500 font-bold">⚠</span>
+                <span>{error || authError}</span>
+              </div>
+            )}
+
+            {/* Campo Email */}
+            <div>
+              <label
+                htmlFor="email"
+                className="block text-sm font-semibold text-slate-700 mb-2"
+              >
+                Correo Electrónico
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-slate-400" />
+                </div>
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="w-full pl-11 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                  placeholder="tu@email.com"
+                />
+              </div>
+            </div>
+
+            {/* Campo Contraseña */}
+            <div>
+              <label
+                htmlFor="password"
+                className="block text-sm font-semibold text-slate-700 mb-2"
+              >
+                Contraseña
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-slate-400" />
+                </div>
+                <input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="w-full pl-11 pr-12 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+            </div>
+
+            {/* Recordarme y Olvidé contraseña */}
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-2 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="w-4 h-4 text-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                />
+                <span className="text-sm text-slate-600 group-hover:text-slate-800 transition-colors">
+                  Recordarme
+                </span>
+              </label>
+              <Link
+                href="/recuperar-password"
+                className="text-sm text-orange-600 hover:text-orange-700 font-medium hover:underline"
+              >
+                ¿Olvidaste tu contraseña?
+              </Link>
+            </div>
+
+            {/* Botón de inicio de sesión */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3.5 rounded-lg font-semibold hover:from-orange-600 hover:to-orange-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl"
+            >
+              {loading ? (
+                <span className="flex items-center justify-center gap-2">
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  Iniciando sesión...
+                </span>
+              ) : (
+                <span className="flex items-center justify-center gap-2">
+                  Iniciar Sesión
+                  <ArrowRight className="w-5 h-5" />
+                </span>
+              )}
+            </button>
+          </form>
+
+          {/* Divider */}
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-slate-200"></div>
+            </div>
+            <div className="relative flex justify-center text-sm">
+              <span className="px-4 bg-white text-slate-500">
+                ¿No tienes cuenta?
+              </span>
             </div>
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          {/* Link a registro */}
+          <Link
+            href="/registro"
+            className="block w-full text-center py-3 px-4 border border-slate-300 rounded-lg font-semibold text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all"
           >
-            {loading ? "Iniciando sesión..." : "Iniciar Sesión"}
-          </button>
-        </form>
+            Crear una cuenta nueva
+          </Link>
 
-        <div className="mt-6 text-center">
-          <p className="text-gray-600 text-sm">
-            ¿No tienes cuenta?{" "}
-            <Link
-              href="/registro"
-              className="text-blue-600 font-medium hover:underline"
-            >
-              Regístrate aquí
+          {/* Footer */}
+          <p className="text-center text-sm text-slate-500 mt-6">
+            Al iniciar sesión, aceptas nuestros{" "}
+            <Link href="/terminos" className="text-orange-600 hover:underline">
+              Términos de Servicio
+            </Link>{" "}
+            y{" "}
+            <Link href="/privacidad" className="text-orange-600 hover:underline">
+              Política de Privacidad
             </Link>
           </p>
+          </div>
         </div>
       </div>
     </div>

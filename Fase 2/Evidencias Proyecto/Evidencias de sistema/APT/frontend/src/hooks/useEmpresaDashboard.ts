@@ -7,14 +7,14 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { empresaService } from "@/services/empresa.service";
-import { vacanteService } from "@/services/vacante.service";
+import { cargoService } from "@/services/cargo.service";
 import { authService } from "@/services/auth.service";
-import { Empresa, VacanteDetalle } from "@/types";
+import { Empresa, CargoDetalle } from "@/types";
 
 export function useEmpresaDashboard() {
   const router = useRouter();
   const [empresa, setEmpresa] = useState<Empresa | null>(null);
-  const [vacantes, setVacantes] = useState<VacanteDetalle[]>([]);
+  const [cargos, setCargos] = useState<CargoDetalle[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,10 +44,10 @@ export function useEmpresaDashboard() {
       console.log("🏢 Perfil empresa:", perfilData);
       setEmpresa(perfilData);
 
-      // Cargar vacantes de la empresa
-      const vacantesData = await vacanteService.getVacantesByEmpresa(empresaId);
-      console.log("💼 Vacantes de la empresa:", vacantesData.length);
-      setVacantes(vacantesData);
+      // Cargar cargos de la empresa
+      const cargosData = await cargoService.getCargosByEmpresa(empresaId);
+      console.log("💼 Cargos de la empresa:", cargosData.length);
+      setCargos(cargosData);
     } catch (err: any) {
       console.error("❌ Error cargando datos:", err);
       setError(err.message || "Error al cargar los datos");
@@ -78,39 +78,39 @@ export function useEmpresaDashboard() {
   }, [router]);
 
   /**
-   * Eliminar vacante
+   * Eliminar cargo
    */
-  const deleteVacante = useCallback(async (vacanteId: number) => {
+  const deleteCargo = useCallback(async (cargoId: number) => {
     try {
-      await vacanteService.deleteVacante(vacanteId);
-      // Actualizar lista de vacantes
-      setVacantes((prev) => prev.filter((v) => v.id !== vacanteId));
+      await cargoService.deleteCargo(cargoId);
+      // Actualizar lista de cargos
+      setCargos((prev) => prev.filter((c) => c.id !== cargoId));
       return true;
     } catch (err: any) {
-      console.error("❌ Error eliminando vacante:", err);
-      setError(err.message || "Error al eliminar vacante");
+      console.error("❌ Error eliminando cargo:", err);
+      setError(err.message || "Error al eliminar cargo");
       return false;
     }
   }, []);
 
   /**
-   * Activar/Desactivar vacante
+   * Activar/Desactivar cargo
    */
-  const toggleVacanteStatus = useCallback(
-    async (vacanteId: number, activa: boolean) => {
+  const toggleCargoStatus = useCallback(
+    async (cargoId: number, activo: boolean) => {
       try {
-        const updated = await vacanteService.toggleVacanteStatus(
-          vacanteId,
-          activa
+        const updated = await cargoService.toggleCargoStatus(
+          cargoId,
+          activo
         );
-        // Actualizar la vacante en la lista
-        setVacantes((prev) =>
-          prev.map((v) => (v.id === vacanteId ? { ...v, activa } : v))
+        // Actualizar el cargo en la lista
+        setCargos((prev) =>
+          prev.map((c) => (c.id === cargoId ? { ...c, activo } : c))
         );
         return true;
       } catch (err: any) {
-        console.error("❌ Error actualizando estado de vacante:", err);
-        setError(err.message || "Error al actualizar vacante");
+        console.error("❌ Error actualizando estado de cargo:", err);
+        setError(err.message || "Error al actualizar cargo");
         return false;
       }
     },
@@ -124,12 +124,12 @@ export function useEmpresaDashboard() {
 
   return {
     empresa,
-    vacantes,
+    cargos,
     loading,
     error,
     refresh,
     logout,
-    deleteVacante,
-    toggleVacanteStatus,
+    deleteCargo,
+    toggleCargoStatus,
   };
 }

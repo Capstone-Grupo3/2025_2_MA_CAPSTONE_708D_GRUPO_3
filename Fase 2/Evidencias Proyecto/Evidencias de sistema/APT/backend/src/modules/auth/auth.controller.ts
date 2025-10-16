@@ -16,11 +16,11 @@ export class AuthController {
     return this.authService.loginEmpresa(loginDto);
   }
 
-  @Post('login/candidato')
-  @ApiOperation({ summary: 'Login de candidato' })
+  @Post('login/postulante')
+  @ApiOperation({ summary: 'Login de postulante' })
   @ApiResponse({ status: 200, description: 'Login exitoso' })
   @ApiResponse({ status: 401, description: 'Credenciales inválidas' })
-  loginCandidato(@Body() loginDto: LoginDto) {
-    return this.authService.loginCandidato(loginDto);
+  loginPostulante(@Body() loginDto: LoginDto) {
+    return this.authService.loginPostulante(loginDto);
   }
 }

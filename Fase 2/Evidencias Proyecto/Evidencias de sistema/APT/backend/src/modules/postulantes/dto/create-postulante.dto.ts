@@ -11,7 +11,12 @@ import {
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export class CreateCandidatoDto {
+export class CreatePostulanteDto {
+  @ApiProperty({ example: '12345678-9' })
+  @IsString()
+  @IsNotEmpty()
+  rut: string;
+
   @ApiProperty({ example: 'Juan Pérez' })
   @IsString()
   @IsNotEmpty()

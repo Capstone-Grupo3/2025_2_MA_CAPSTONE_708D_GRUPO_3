@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { EmpresasService } from '../empresas/empresas.service';
-import { CandidatosService } from '../candidatos/candidatos.service';
+import { PostulantesService } from '../postulantes/postulantes.service';
 import { LoginDto } from './dto/login.dto';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private empresasService: EmpresasService,
-    private candidatosService: CandidatosService,
+    private postulantesService: PostulantesService,
   ) {}
 
   async loginEmpresa(loginDto: LoginDto) {
@@ -36,29 +36,29 @@ export class AuthService {
     };
   }
 
-  async loginCandidato(loginDto: LoginDto) {
-    const candidato = await this.candidatosService.findByEmail(loginDto.correo);
+  async loginPostulante(loginDto: LoginDto) {
+    const postulante = await this.postulantesService.findByEmail(loginDto.correo);
 
     if (
-      !candidato ||
-      !(await bcrypt.compare(loginDto.contrasena, candidato.contrasenaHash))
+      !postulante ||
+      !(await bcrypt.compare(loginDto.contrasena, postulante.contrasenaHash))
     ) {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
     const payload = {
-      sub: candidato.id,
-      email: candidato.correo,
-      tipo: 'candidato',
+      sub: postulante.id,
+      email: postulante.correo,
+      tipo: 'postulante',
     };
 
     return {
       access_token: this.jwtService.sign(payload),
       user: {
-        id: candidato.id,
-        nombre: candidato.nombre,
-        correo: candidato.correo,
-        tipo: 'candidato',
+        id: postulante.id,
+        nombre: postulante.nombre,
+        correo: postulante.correo,
+        tipo: 'postulante',
       },
     };
   }
@@ -66,8 +66,8 @@ export class AuthService {
   async validateUser(userId: number, tipo: string) {
     if (tipo === 'empresa') {
       return this.empresasService.findOne(userId);
-    } else if (tipo === 'candidato') {
-      return this.candidatosService.findOne(userId);
+    } else if (tipo === 'postulante') {
+      return this.postulantesService.findOne(userId);
     }
     return null;
   }

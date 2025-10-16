@@ -25,6 +25,7 @@ export class EmpresasService {
 
     const empresa = await this.prisma.empresa.create({
       data: {
+        rut: createEmpresaDto.rut,
         nombre: createEmpresaDto.nombre,
         correo: createEmpresaDto.correo,
         contrasenaHash: hashedPassword,
@@ -42,6 +43,7 @@ export class EmpresasService {
     return this.prisma.empresa.findMany({
       select: {
         id: true,
+        rut: true,
         nombre: true,
         correo: true,
         descripcion: true,
@@ -57,6 +59,7 @@ export class EmpresasService {
       where: { id },
       select: {
         id: true,
+        rut: true,
         nombre: true,
         correo: true,
         descripcion: true,
@@ -94,6 +97,7 @@ export class EmpresasService {
       data,
       select: {
         id: true,
+        rut: true,
         nombre: true,
         correo: true,
         descripcion: true,

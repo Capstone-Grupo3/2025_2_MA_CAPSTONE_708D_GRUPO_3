@@ -9,6 +9,11 @@ import {
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateEmpresaDto {
+  @ApiProperty({ example: '76123456-7' })
+  @IsString()
+  @IsNotEmpty()
+  rut: string;
+
   @ApiProperty({ example: 'Tech Solutions SA' })
   @IsString()
   @IsNotEmpty()
@@ -34,7 +39,7 @@ export class CreateEmpresaDto {
   descripcion?: string;
 
   @ApiProperty({ example: 'https://example.com/logo.png', required: false })
-  @IsUrl()
   @IsOptional()
+  @IsUrl()
   logoUrl?: string;
 }

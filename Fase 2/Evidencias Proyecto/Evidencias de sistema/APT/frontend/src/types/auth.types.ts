@@ -2,7 +2,7 @@
  * Tipos relacionados con Autenticación
  */
 
-export type UserType = "empresa" | "candidato";
+export type UserType = "empresa" | "postulante";
 
 export interface LoginCredentials {
   correo: string;
@@ -22,12 +22,15 @@ export interface RegisterEmpresaDTO {
   rut?: string;
 }
 
-export interface RegisterCandidatoDTO {
+export interface RegisterPostulanteDTO {
+  rut: string;
   nombre: string;
   correo: string;
   contrasena: string;
   telefono?: string;
   linkedinUrl?: string;
+  skillsJson?: any;
+  experienciaAnios?: number;
 }
 
 export interface AuthUser {

@@ -20,11 +20,11 @@ class AuthService {
   }
 
   /**
-   * Login de candidato
+   * Login de postulante
    */
-  async loginCandidato(credentials: LoginCredentials): Promise<LoginResponse> {
+  async loginPostulante(credentials: LoginCredentials): Promise<LoginResponse> {
     const response = await apiService.post<LoginResponse>(
-      "/auth/login/candidato",
+      "/auth/login/postulante",
       credentials,
       false // No requiere autenticación
     );
@@ -55,9 +55,9 @@ class AuthService {
   /**
    * Obtener tipo de usuario actual
    */
-  getUserType(): "empresa" | "candidato" | null {
+  getUserType(): "empresa" | "postulante" | null {
     if (typeof window !== "undefined") {
-      return localStorage.getItem("userType") as "empresa" | "candidato" | null;
+      return localStorage.getItem("userType") as "empresa" | "postulante" | null;
     }
     return null;
   }
@@ -72,7 +72,7 @@ class AuthService {
   /**
    * Guardar token y tipo de usuario
    */
-  saveAuth(token: string, userType: "empresa" | "candidato"): void {
+  saveAuth(token: string, userType: "empresa" | "postulante"): void {
     if (typeof window !== "undefined") {
       localStorage.setItem("token", token);
       localStorage.setItem("userType", userType);

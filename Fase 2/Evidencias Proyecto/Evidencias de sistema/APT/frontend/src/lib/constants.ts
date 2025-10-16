@@ -8,10 +8,11 @@ import { TipoContrato, Modalidad, EstadoPostulacion } from "@/types";
  * Labels para tipos de contrato
  */
 export const TIPO_CONTRATO_LABELS: Record<TipoContrato, string> = {
-  INDEFINIDO: "Indefinido",
-  PLAZO_FIJO: "Plazo Fijo",
-  HONORARIOS: "Honorarios",
-  PART_TIME: "Part Time",
+  FULL_TIME: "Tiempo Completo",
+  PART_TIME: "Medio Tiempo",
+  CONTRACTOR: "Contratista",
+  TEMPORARY: "Temporal",
+  INTERNSHIP: "Pasantía",
 };
 
 /**
@@ -49,10 +50,11 @@ export const ESTADO_POSTULACION_COLORS: Record<EstadoPostulacion, string> = {
  * Opciones de tipo de contrato para formularios
  */
 export const TIPO_CONTRATO_OPTIONS: { value: TipoContrato; label: string }[] = [
-  { value: "INDEFINIDO", label: "Indefinido" },
-  { value: "PLAZO_FIJO", label: "Plazo Fijo" },
-  { value: "HONORARIOS", label: "Honorarios" },
-  { value: "PART_TIME", label: "Part Time" },
+  { value: "FULL_TIME", label: "Tiempo Completo" },
+  { value: "PART_TIME", label: "Medio Tiempo" },
+  { value: "CONTRACTOR", label: "Contratista" },
+  { value: "TEMPORARY", label: "Temporal" },
+  { value: "INTERNSHIP", label: "Pasantía" },
 ];
 
 /**

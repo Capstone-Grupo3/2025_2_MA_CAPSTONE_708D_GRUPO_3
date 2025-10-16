@@ -14,26 +14,25 @@ import {
 } from "lucide-react";
 
 // Importar tipos centralizados
-import { Vacante } from "@/types";
+import { Cargo } from "@/types";
 
 // Importar hook personalizado
-import { useCandidatoPortal } from "@/hooks/useCandidatoPortal";
+import { usePostulantePortal } from "@/hooks/usePostulantePortal";
 
 // Importar utilidades
 import { formatDate, getEstadoColor, formatCurrency } from "@/lib/formatters";
 
 export default function PortalCandidatoPage() {
   // Usar hook personalizado para toda la lógica
-  const { candidato, vacantes, postulaciones, loading, logout } =
-    useCandidatoPortal();
+  const { postulante, cargos, postulaciones, loading, logout } =
+    usePostulantePortal();
 
   // Estados locales de UI
   const [activeTab, setActiveTab] = useState<
-    "vacantes" | "postulaciones" | "perfil"
-  >("vacantes");
+    "cargos" | "postulaciones" | "perfil"
+  >("cargos");
   const [showModal, setShowModal] = useState(false);
-  const [vacanteSeleccionada, setVacanteSeleccionada] =
-    useState<Vacante | null>(null);
+  const [cargoSeleccionado, setCargoSeleccionado] = useState<Cargo | null>(null);
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -41,23 +40,23 @@ export default function PortalCandidatoPage() {
     logout();
   };
 
-  const handlePostular = (vacante: Vacante) => {
-    setVacanteSeleccionada(vacante);
+  const handlePostular = (cargo: Cargo) => {
+    setCargoSeleccionado(cargo);
     setRespuestas({});
     setShowModal(true);
   };
 
   const handleCerrarModal = () => {
     setShowModal(false);
-    setVacanteSeleccionada(null);
+    setCargoSeleccionado(null);
     setRespuestas({});
   };
 
   const handleEnviarPostulacion = async () => {
-    if (!vacanteSeleccionada || !candidato) return;
+    if (!cargoSeleccionado || !postulante) return;
 
     // Validar que todas las preguntas estén respondidas
-    const preguntas = vacanteSeleccionada.preguntasJson?.preguntas || [];
+    const preguntas = cargoSeleccionado.preguntasJson?.preguntas || [];
     if (preguntas.length > 0) {
       const todasRespondidas = preguntas.every((_: any, index: number) =>
         respuestas[`pregunta_${index + 1}`]?.trim()
@@ -80,7 +79,7 @@ export default function PortalCandidatoPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            idVacante: vacanteSeleccionada.id,
+            idVacante: cargoSeleccionado.id,
             respuestasJson: respuestas,
           }),
         }
@@ -116,25 +115,25 @@ export default function PortalCandidatoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-orange-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-md border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="bg-blue-600 p-2 rounded-lg">
+              <div className="bg-gradient-to-br from-orange-500 to-orange-600 p-2.5 rounded-xl shadow-lg">
                 <Briefcase className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold text-gray-800">
-                  Portal de Candidato
+                <h1 className="text-xl font-bold text-slate-900">
+                  Portal de Postulante
                 </h1>
-                <p className="text-sm text-gray-600">{candidato?.nombre}</p>
+                <p className="text-sm text-slate-600">{postulante?.nombre}</p>
               </div>
             </div>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
+              className="flex items-center gap-2 px-4 py-2 text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 rounded-lg transition-all shadow-sm"
             >
               <LogOut size={20} />
               Cerrar Sesión
@@ -144,28 +143,28 @@ export default function PortalCandidatoPage() {
       </header>
 
       {/* Navigation Tabs */}
-      <div className="bg-white border-b">
+      <div className="bg-white border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <nav className="flex gap-8">
             <button
-              onClick={() => setActiveTab("vacantes")}
-              className={`py-4 px-2 border-b-2 font-medium transition-all ${
-                activeTab === "vacantes"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-600 hover:text-gray-800"
+              onClick={() => setActiveTab("cargos")}
+              className={`py-4 px-2 border-b-2 font-semibold transition-all ${
+                activeTab === "cargos"
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
               }`}
             >
               <div className="flex items-center gap-2">
                 <Search size={20} />
-                Vacantes Disponibles
+                cargos Disponibles
               </div>
             </button>
             <button
               onClick={() => setActiveTab("postulaciones")}
-              className={`py-4 px-2 border-b-2 font-medium transition-all ${
+              className={`py-4 px-2 border-b-2 font-semibold transition-all ${
                 activeTab === "postulaciones"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-600 hover:text-gray-800"
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -175,10 +174,10 @@ export default function PortalCandidatoPage() {
             </button>
             <button
               onClick={() => setActiveTab("perfil")}
-              className={`py-4 px-2 border-b-2 font-medium transition-all ${
+              className={`py-4 px-2 border-b-2 font-semibold transition-all ${
                 activeTab === "perfil"
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-600 hover:text-gray-800"
+                  ? "border-orange-500 text-orange-600"
+                  : "border-transparent text-slate-600 hover:text-slate-800 hover:border-slate-300"
               }`}
             >
               <div className="flex items-center gap-2">
@@ -192,77 +191,85 @@ export default function PortalCandidatoPage() {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Vacantes Tab */}
-        {activeTab === "vacantes" && (
+        {/* cargos Tab */}
+        {activeTab === "cargos" && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold text-gray-800">
-                Vacantes Disponibles ({vacantes.length})
+              <h2 className="text-3xl font-bold text-slate-900">
+                Cargos Disponibles <span className="text-orange-500">({cargos.length})</span>
               </h2>
             </div>
 
-            <div className="grid gap-6 md:grid-cols-2">
-              {vacantes.map((vacante) => (
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
+              {cargos.map((cargo) => (
                 <div
-                  key={vacante.id}
-                  className="bg-white rounded-xl shadow-sm border hover:shadow-md transition-all p-6"
+                  key={cargo.id}
+                  className="bg-white rounded-2xl shadow-md border border-slate-200 hover:shadow-xl hover:border-orange-200 transition-all p-6 group"
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
-                      <h3 className="text-xl font-bold text-gray-800 mb-2">
-                        {vacante.titulo}
+                      <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-orange-600 transition-colors">
+                        {cargo.titulo}
                       </h3>
-                      <p className="text-gray-600 font-medium">
-                        {vacante.empresa.nombre}
+                      <p className="text-slate-600 font-semibold">
+                        {cargo.empresa.nombre}
                       </p>
                     </div>
-                    {vacante.empresa.logoUrl && (
-                      <div className="w-12 h-12 rounded-lg bg-gray-100 flex items-center justify-center">
-                        <Briefcase className="w-6 h-6 text-gray-400" />
+                    {cargo.empresa.logoUrl && (
+                      <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-orange-50 to-orange-100 flex items-center justify-center shadow-sm">
+                        <Briefcase className="w-7 h-7 text-orange-500" />
                       </div>
                     )}
                   </div>
 
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {vacante.descripcion}
+                  <p className="text-slate-600 mb-4 line-clamp-3 text-sm leading-relaxed">
+                    {cargo.descripcion}
                   </p>
 
-                  <div className="space-y-2 mb-4">
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <MapPin size={16} />
-                      <span className="text-sm">{vacante.ubicacion}</span>
+                  <div className="space-y-2.5 mb-5">
+                    <div className="flex items-center gap-2.5 text-slate-700">
+                      <div className="bg-orange-50 p-1.5 rounded-lg">
+                        <MapPin size={16} className="text-orange-500" />
+                      </div>
+                      <span className="text-sm font-medium">{cargo.ubicacion}</span>
                     </div>
-                    {vacante.salario && (
-                      <div className="flex items-center gap-2 text-gray-600">
-                        <DollarSign size={16} />
-                        <span className="text-sm">
-                          {formatCurrency(vacante.salario)}
+                    {cargo.salarioEstimado && (
+                      <div className="flex items-center gap-2.5 text-slate-700">
+                        <div className="bg-green-50 p-1.5 rounded-lg">
+                          <DollarSign size={16} className="text-green-600" />
+                        </div>
+                        <span className="text-sm font-medium">
+                          {formatCurrency(cargo.salarioEstimado)}
                         </span>
                       </div>
                     )}
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Clock size={16} />
-                      <span className="text-sm">{vacante.tipoContrato}</span>
+                    <div className="flex items-center gap-2.5 text-slate-700">
+                      <div className="bg-blue-50 p-1.5 rounded-lg">
+                        <Clock size={16} className="text-blue-600" />
+                      </div>
+                      <span className="text-sm font-medium">{cargo.tipoContrato}</span>
                     </div>
                   </div>
 
                   <button
-                    onClick={() => handlePostular(vacante)}
-                    className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition-all font-medium"
+                    onClick={() => handlePostular(cargo)}
+                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-3 rounded-xl hover:from-orange-600 hover:to-orange-700 transition-all font-semibold shadow-md hover:shadow-lg"
                   >
                     Postular Ahora
                   </button>
                 </div>
               ))}
 
-              {vacantes.length === 0 && (
-                <div className="col-span-2 text-center py-12">
-                  <Search className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">
-                    No hay vacantes disponibles
+              {cargos.length === 0 && (
+                <div className="col-span-2 text-center py-16 bg-white rounded-2xl shadow-sm border border-slate-200">
+                  <div className="bg-orange-50 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Search className="w-10 h-10 text-orange-500" />
+                  </div>
+                  <h3 className="text-2xl font-bold text-slate-900 mb-2">
+                    No hay cargos disponibles
                   </h3>
-                  <p className="text-gray-600">
-                    Vuelve más tarde para ver nuevas oportunidades
+                  <p className="text-slate-600">
+                    Vuelve más tarde para ver nuevas oportunidades laborales
                   </p>
                 </div>
               )}
@@ -286,10 +293,10 @@ export default function PortalCandidatoPage() {
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
                       <h3 className="text-xl font-bold text-gray-800 mb-1">
-                        {postulacion.vacante.titulo}
+                        {postulacion.cargo.titulo}
                       </h3>
                       <p className="text-gray-600 mb-3">
-                        {postulacion.vacante.empresa.nombre}
+                        {postulacion.cargo.empresa.nombre}
                       </p>
 
                       <div className="flex flex-wrap gap-4">
@@ -331,14 +338,14 @@ export default function PortalCandidatoPage() {
                     No tienes postulaciones aún
                   </h3>
                   <p className="text-gray-600 mb-4">
-                    Explora las vacantes disponibles y postula a las que te
+                    Explora las cargos disponibles y postula a las que te
                     interesen
                   </p>
                   <button
-                    onClick={() => setActiveTab("vacantes")}
+                    onClick={() => setActiveTab("cargos")}
                     className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-all"
                   >
-                    Ver Vacantes
+                    Ver cargos
                   </button>
                 </div>
               )}
@@ -347,7 +354,7 @@ export default function PortalCandidatoPage() {
         )}
 
         {/* Perfil Tab */}
-        {activeTab === "perfil" && candidato && (
+        {activeTab === "perfil" && postulante && (
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-800">Mi Perfil</h2>
 
@@ -357,50 +364,50 @@ export default function PortalCandidatoPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Nombre Completo
                   </label>
-                  <p className="text-lg text-gray-800">{candidato.nombre}</p>
+                  <p className="text-lg text-gray-800">{postulante.nombre}</p>
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Correo Electrónico
                   </label>
-                  <p className="text-lg text-gray-800">{candidato.correo}</p>
+                  <p className="text-lg text-gray-800">{postulante.correo}</p>
                 </div>
 
-                {candidato.telefono && (
+                {postulante.telefono && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Teléfono
                     </label>
                     <p className="text-lg text-gray-800">
-                      {candidato.telefono}
+                      {postulante.telefono}
                     </p>
                   </div>
                 )}
 
-                {candidato.experienciaAnios !== undefined && (
+                {postulante.experienciaAnios !== undefined && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Años de Experiencia
                     </label>
                     <p className="text-lg text-gray-800">
-                      {candidato.experienciaAnios} años
+                      {postulante.experienciaAnios} años
                     </p>
                   </div>
                 )}
 
-                {candidato.linkedinUrl && (
+                {postulante.linkedinUrl && (
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
                       Perfil de LinkedIn
                     </label>
                     <a
-                      href={candidato.linkedinUrl}
+                      href={postulante.linkedinUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-600 hover:underline"
                     >
-                      {candidato.linkedinUrl}
+                      {postulante.linkedinUrl}
                     </a>
                   </div>
                 )}
@@ -445,12 +452,12 @@ export default function PortalCandidatoPage() {
       </main>
 
       {/* Modal de Postulación */}
-      {showModal && vacanteSeleccionada && (
+      {showModal && cargoSeleccionado && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
               <h3 className="text-2xl font-bold text-gray-800">
-                Postular a {vacanteSeleccionada.titulo}
+                Postular a {cargoSeleccionado.titulo}
               </h3>
               <button
                 onClick={handleCerrarModal}
@@ -464,15 +471,15 @@ export default function PortalCandidatoPage() {
             <div className="p-6 space-y-6">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-900 mb-2">
-                  {vacanteSeleccionada.empresa.nombre}
+                  {cargoSeleccionado.empresa.nombre}
                 </h4>
                 <p className="text-sm text-blue-700">
-                  {vacanteSeleccionada.ubicacion} •{" "}
-                  {vacanteSeleccionada.tipoContrato}
+                  {cargoSeleccionado.ubicacion} •{" "}
+                  {cargoSeleccionado.tipoContrato}
                 </p>
               </div>
 
-              {vacanteSeleccionada.preguntasJson?.preguntas?.length > 0 ? (
+              {cargoSeleccionado.preguntasJson?.preguntas?.length > 0 ? (
                 <>
                   <div>
                     <h4 className="font-semibold text-gray-800 mb-3">
@@ -480,11 +487,11 @@ export default function PortalCandidatoPage() {
                     </h4>
                     <p className="text-sm text-gray-600 mb-4">
                       Estas respuestas serán analizadas por IA para evaluar tu
-                      compatibilidad con la vacante.
+                      compatibilidad con el cargo.
                     </p>
                   </div>
 
-                  {vacanteSeleccionada.preguntasJson.preguntas.map(
+                  {cargoSeleccionado.preguntasJson.preguntas.map(
                     (pregunta: any, index: number) => (
                       <div key={index} className="space-y-2">
                         <label className="block text-sm font-medium text-gray-700">
@@ -511,7 +518,7 @@ export default function PortalCandidatoPage() {
               ) : (
                 <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
                   <p className="text-gray-600">
-                    Esta vacante no tiene preguntas específicas. Puedes postular
+                    Esta cargo no tiene preguntas específicas. Puedes postular
                     directamente.
                   </p>
                 </div>

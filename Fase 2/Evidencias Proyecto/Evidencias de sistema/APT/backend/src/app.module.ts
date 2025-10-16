@@ -3,8 +3,8 @@ import { ConfigModule } from '@nestjs/config';
 import { PrismaModule } from './common/prisma/prisma.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { EmpresasModule } from './modules/empresas/empresas.module';
-import { CandidatosModule } from './modules/candidatos/candidatos.module';
-import { VacantesModule } from './modules/vacantes/vacantes.module';
+import { PostulantesModule } from './modules/postulantes/postulantes.module';
+import { CargoModule } from './modules/cargos/cargos.module';
 import { PostulacionesModule } from './modules/postulaciones/postulaciones.module';
 import { IaModule } from './modules/ia/ia.module';
 import { StorageModule } from './modules/storage/storage.module';
@@ -17,8 +17,8 @@ import { StorageModule } from './modules/storage/storage.module';
     PrismaModule,
     AuthModule,
     EmpresasModule,
-    CandidatosModule,
-    VacantesModule,
+    PostulantesModule,
+    CargoModule,
     PostulacionesModule,
     IaModule,
     StorageModule,

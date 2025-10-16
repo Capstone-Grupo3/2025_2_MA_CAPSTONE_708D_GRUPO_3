@@ -7,24 +7,24 @@ import apiService from "./api.service";
 
 class PostulacionService {
   /**
-   * Obtener postulaciones de un candidato
+   * Obtener postulaciones de un postulante
    */
-  async getPostulacionesByCandidato(
-    candidatoId: number
+  async getPostulacionesByPostulante(
+    postulanteId: number
   ): Promise<Postulacion[]> {
     return apiService.get<Postulacion[]>(
-      `/postulaciones/candidato/${candidatoId}`
+      `/postulaciones/postulante/${postulanteId}`
     );
   }
 
   /**
-   * Obtener postulaciones de una vacante
+   * Obtener postulaciones de un cargo
    */
-  async getPostulacionesByVacante(
-    vacanteId: number
+  async getPostulacionesByCargo(
+    cargoId: number
   ): Promise<PostulacionDetalle[]> {
     return apiService.get<PostulacionDetalle[]>(
-      `/postulaciones/vacante/${vacanteId}`
+      `/postulaciones/cargo/${cargoId}`
     );
   }
 
@@ -43,8 +43,9 @@ class PostulacionService {
   ): Promise<PostulacionDetalle> {
     const formData = new FormData();
 
-    formData.append("vacanteId", data.vacanteId.toString());
-    formData.append("candidatoId", data.candidatoId.toString());
+    // El backend aún usa cargoId en el endpoint
+    formData.append("cargoId", data.cargoId.toString());
+    formData.append("postulanteId", data.postulanteId.toString());
 
     if (data.cvFile) {
       formData.append("cv", data.cvFile);
