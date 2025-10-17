@@ -38,8 +38,8 @@ export class PostulacionesController {
   }
 
   @Get('vacante/:vacanteId')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
   @ApiOperation({ summary: 'Obtener postulaciones de una vacante' })
   findByVacante(@Param('vacanteId') vacanteId: string) {
     return this.postulacionesService.findByVacante(+vacanteId);
