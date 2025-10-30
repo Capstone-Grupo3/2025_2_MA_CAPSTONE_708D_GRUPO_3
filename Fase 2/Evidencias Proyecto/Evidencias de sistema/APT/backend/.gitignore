@@ -47,6 +47,11 @@ lerna-debug.log*
 .env.test.local
 .env.production.local
 .env*.local
+.env.backup
+.env.backup.*
+*.env.backup
+.env.production
+.env.staging
 
 # Prisma
 *.db
