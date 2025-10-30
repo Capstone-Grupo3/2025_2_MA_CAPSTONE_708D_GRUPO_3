@@ -1,15 +1,56 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  const logger = new Logger('Bootstrap');
+  
+  // Validar variables de entorno críticas
+  const requiredEnvVars = [
+    'DATABASE_URL',
+    'JWT_SECRET',
+    'SUPABASE_URL',
+    'SUPABASE_SERVICE_KEY',
+  ];
+
+  const missingVars = requiredEnvVars.filter(
+    (varName) => !process.env[varName],
+  );
+
+  if (missingVars.length > 0) {
+    logger.error(`❌ Missing required environment variables: ${missingVars.join(', ')}`);
+    logger.error('Please configure them in Railway Dashboard → Variables');
+    process.exit(1);
+  }
+
+  logger.log('✅ All required environment variables are configured');
+
   const app = await NestFactory.create(AppModule);
 
-  // CORS
+  // Health check endpoint
+  app.getHttpAdapter().get('/health', (req, res) => {
+    res.status(200).json({
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: process.env.NODE_ENV,
+    });
+  });
+
+  // CORS - Permitir frontend en Vercel y desarrollo local
+  const allowedOrigins = [
+    'https://frontend-magnolias.vercel.app',
+    'http://localhost:3001',
+    'http://localhost:3000',
+    process.env.FRONTEND_URL, // Variable de entorno adicional
+  ].filter(Boolean); // Eliminar valores undefined
+
   app.enableCors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:3001',
+    origin: allowedOrigins,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
   // Global validation pipe
@@ -33,9 +74,8 @@ async function bootstrap() {
 
   const port = process.env.PORT || 3000;
   await app.listen(port);
-  console.log(`🚀 Application is running on: http://localhost:${port}`);
-  console.log(
-    `📚 Swagger docs available at: http://localhost:${port}/api/docs`,
-  );
+  logger.log(`🚀 Application is running on: http://localhost:${port}`);
+  logger.log(`📚 Swagger docs available at: http://localhost:${port}/api/docs`);
+  logger.log(`💚 Health check available at: http://localhost:${port}/health`);
 }
 bootstrap();

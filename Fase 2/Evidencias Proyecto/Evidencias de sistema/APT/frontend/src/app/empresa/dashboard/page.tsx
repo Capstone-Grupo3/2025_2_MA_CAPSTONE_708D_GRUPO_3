@@ -38,17 +38,19 @@ export default function DashboardEmpresaPage() {
   const {
     empresa,
     cargos,
+    postulaciones,
     loading,
     logout,
     deleteCargo,
     toggleCargoStatus,
+    refresh,
   } = useEmpresaDashboard();
 
   // Estados locales de UI
   const [activeTab, setActiveTab] = useState<
     "cargos" | "postulaciones" | "crear" | "perfil"
   >("cargos");
-  const [postulaciones, setPostulaciones] = useState<PostulacionDetalle[]>([]);
+  const [postulacionesFiltradas, setPostulacionesFiltradas] = useState<PostulacionDetalle[]>([]);
 
   // Estado para crear cargo
   const [nuevoCargo, setNuevoCargo] = useState({
@@ -101,7 +103,17 @@ export default function DashboardEmpresaPage() {
 
       if (response.ok) {
         const data = await response.json();
-        setPostulaciones(data);
+        
+        // Encontrar el cargo en la lista de cargos
+        const cargo = cargos.find(c => c.id === cargoId);
+        
+        // Enriquecer las postulaciones con información del cargo si no viene del backend
+        const postulacionesEnriquecidas = data.map((p: any) => ({
+          ...p,
+          cargo: p.cargo || cargo // Usar cargo del backend si existe, sino usar el de la lista local
+        }));
+        
+        setPostulacionesFiltradas(postulacionesEnriquecidas);
         setActiveTab("postulaciones");
       }
     } catch (error) {
@@ -215,10 +227,8 @@ export default function DashboardEmpresaPage() {
 
       if (response.ok) {
         alert(`Postulación ${nuevoEstado.toLowerCase()}`);
-        // Recargar postulaciones
-        if (postulaciones.length > 0 && postulaciones[0].cargo?.id) {
-          fetchPostulacionesByCargo(postulaciones[0].cargo.id);
-        }
+        // Recargar todas las postulaciones
+        refresh();
       } else {
         alert("Error al actualizar la postulación");
       }
@@ -466,14 +476,25 @@ export default function DashboardEmpresaPage() {
                           <Clock size={16} />
                           {cargo.tipoContrato}
                         </div>
-                        <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => fetchPostulacionesByCargo(cargo.id)}
+                          className="flex items-center gap-1 hover:text-blue-600 transition-colors cursor-pointer"
+                          title="Ver postulaciones"
+                        >
                           <Users size={16} />
                           {cargo._count?.postulaciones || 0} postulaciones
-                        </div>
+                        </button>
                       </div>
                     </div>
 
                     <div className="flex gap-2 ml-4">
+                      <button
+                        onClick={() => fetchPostulacionesByCargo(cargo.id)}
+                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-all"
+                        title="Ver Postulaciones"
+                      >
+                        <Users size={20} />
+                      </button>
                       <button
                         onClick={() => handleDeleteCargo(cargo.id)}
                         className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-all"
@@ -510,12 +531,22 @@ export default function DashboardEmpresaPage() {
         {/* Postulaciones Tab */}
         {activeTab === "postulaciones" && (
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800">
-              Postulaciones Recibidas ({postulaciones.length})
-            </h2>
+            <div className="flex justify-between items-center">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Postulaciones Recibidas ({postulacionesFiltradas.length > 0 ? postulacionesFiltradas.length : postulaciones.length})
+              </h2>
+              {postulacionesFiltradas.length > 0 && (
+                <button
+                  onClick={() => setPostulacionesFiltradas([])}
+                  className="text-sm text-blue-600 hover:text-blue-700 underline"
+                >
+                  Ver todas las postulaciones
+                </button>
+              )}
+            </div>
 
             <div className="space-y-4">
-              {postulaciones.map((postulacion) => (
+              {(postulacionesFiltradas.length > 0 ? postulacionesFiltradas : postulaciones).map((postulacion) => (
                 <div
                   key={postulacion.id}
                   className="bg-white rounded-xl shadow-sm border p-6"
@@ -539,7 +570,7 @@ export default function DashboardEmpresaPage() {
                       <p className="text-gray-600 mb-3">
                         Cargo:{" "}
                         <span className="font-medium">
-                          {postulacion.cargo.titulo}
+                          {postulacion.cargo?.titulo || "No especificado"}
                         </span>
                       </p>
 
@@ -609,7 +640,7 @@ export default function DashboardEmpresaPage() {
                 </div>
               ))}
 
-              {postulaciones.length === 0 && (
+              {(postulacionesFiltradas.length === 0 && postulaciones.length === 0) && (
                 <div className="text-center py-12">
                   <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-800 mb-2">
