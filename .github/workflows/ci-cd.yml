@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+﻿name: CI/CD Pipeline
 
 on:
   push:
@@ -35,29 +35,29 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: backend/package-lock.json
+          cache-dependency-path: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend/package-lock.json
 
       - name: Install dependencies
-        working-directory: ./backend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend
         run: npm ci
 
       - name: Generate Prisma Client
-        working-directory: ./backend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend
         run: npx prisma generate
 
       - name: Run Prisma migrations
-        working-directory: ./backend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
         run: npx prisma migrate deploy
 
       - name: Run linter
-        working-directory: ./backend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend
         run: npm run lint
         continue-on-error: true
 
       - name: Run tests
-        working-directory: ./backend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend
         env:
           DATABASE_URL: postgresql://test_user:test_password@localhost:5432/test_db?schema=public
           JWT_SECRET: test-secret-key-for-ci
@@ -67,14 +67,14 @@ jobs:
         continue-on-error: true
 
       - name: Build
-        working-directory: ./backend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend
         run: npm run build
 
       - name: Upload backend build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: backend-build
-          path: backend/dist
+          path: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend/dist
           retention-days: 1
 
   # Frontend Tests and Build
@@ -90,19 +90,19 @@ jobs:
         with:
           node-version: '22'
           cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/frontend/package-lock.json
 
       - name: Install dependencies
-        working-directory: ./frontend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/frontend
         run: npm ci --legacy-peer-deps
 
       - name: Run linter
-        working-directory: ./frontend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/frontend
         run: npm run lint
         continue-on-error: true
 
       - name: Build
-        working-directory: ./frontend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/frontend
         env:
           NEXT_PUBLIC_API_URL: http://localhost:3000
         run: npm run build
@@ -111,7 +111,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: frontend-build
-          path: frontend/.next
+          path: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/frontend/.next
           retention-days: 1
 
   # Docker Build Test (solo en main)
@@ -130,8 +130,8 @@ jobs:
       - name: Build Backend Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
-          file: ./backend/Dockerfile
+          context: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend
+          file: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend/Dockerfile
           push: false
           tags: apt-backend:latest
           cache-from: type=gha
@@ -140,8 +140,8 @@ jobs:
       - name: Build Frontend Docker image
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
-          file: ./frontend/Dockerfile
+          context: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/frontend
+          file: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/frontend/Dockerfile
           push: false
           tags: apt-frontend:latest
           cache-from: type=gha
@@ -161,7 +161,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
-          scan-ref: './backend'
+          scan-ref: 'Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend'
           format: 'sarif'
           output: 'trivy-backend-results.sarif'
         continue-on-error: true
@@ -170,7 +170,7 @@ jobs:
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs'
-          scan-ref: './frontend'
+          scan-ref: 'Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/frontend'
           format: 'sarif'
           output: 'trivy-frontend-results.sarif'
         continue-on-error: true
@@ -180,3 +180,5 @@ jobs:
         with:
           sarif_file: '.'
         continue-on-error: true
+
+

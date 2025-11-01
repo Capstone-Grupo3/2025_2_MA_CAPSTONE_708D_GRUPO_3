@@ -1,4 +1,4 @@
-name: Create Release
+﻿name: Create Release
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  # Validación y creación de release
+  # ValidaciÃ³n y creaciÃ³n de release
   create-release:
     runs-on: ubuntu-latest
     
@@ -28,10 +28,10 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         run: |
           if [[ ! ${{ steps.get_version.outputs.version }} =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-            echo "❌ Error: Version tag must follow semver format (v1.0.0)"
+            echo "âŒ Error: Version tag must follow semver format (v1.0.0)"
             exit 1
           fi
-          echo "✅ Version format is valid: ${{ steps.get_version.outputs.version }}"
+          echo "âœ… Version format is valid: ${{ steps.get_version.outputs.version }}"
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -39,13 +39,13 @@ jobs:
           node-version: '20'
 
       - name: Build Backend
-        working-directory: ./backend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/backend
         run: |
           npm ci
           npm run build
 
       - name: Build Frontend
-        working-directory: ./frontend
+        working-directory: Fase 2/Evidencias Proyecto/Evidencias de sistema/APT/frontend
         run: |
           npm ci
           npm run build
@@ -79,40 +79,41 @@ jobs:
           tag_name: ${{ steps.get_version.outputs.version }}
           release_name: Release ${{ steps.get_version.outputs.version }}
           body: |
-            ## 🚀 Release ${{ steps.get_version.outputs.version }}
+            ## ðŸš€ Release ${{ steps.get_version.outputs.version }}
             
             **Fecha:** $(date +'%Y-%m-%d %H:%M:%S')
             
-            ### 📝 Cambios
+            ### ðŸ“ Cambios
             
             ${{ steps.changelog.outputs.result }}
             
-            ### 🎯 Deployment
+            ### ðŸŽ¯ Deployment
             
-            Los servicios se desplegarán automáticamente:
-            - **Backend**: Railway detectará este push y deployará automáticamente
-            - **Frontend**: Vercel detectará este push y deployará automáticamente
+            Los servicios se desplegarÃ¡n automÃ¡ticamente:
+            - **Backend**: Railway detectarÃ¡ este push y deployarÃ¡ automÃ¡ticamente
+            - **Frontend**: Vercel detectarÃ¡ este push y deployarÃ¡ automÃ¡ticamente
             
-            ### ✅ Builds
+            ### âœ… Builds
             
-            - ✅ Backend compilado exitosamente
-            - ✅ Frontend compilado exitosamente
+            - âœ… Backend compilado exitosamente
+            - âœ… Frontend compilado exitosamente
             
             ---
             
-            **Nota:** Este es un release automático generado por GitHub Actions.
-            Los deployments se realizan automáticamente por Railway y Vercel.
+            **Nota:** Este es un release automÃ¡tico generado por GitHub Actions.
+            Los deployments se realizan automÃ¡ticamente por Railway y Vercel.
           draft: false
           prerelease: ${{ contains(steps.get_version.outputs.version, 'alpha') || contains(steps.get_version.outputs.version, 'beta') || contains(steps.get_version.outputs.version, 'rc') }}
 
       - name: Notify Success
         run: |
-          echo "✅ Release ${{ steps.get_version.outputs.version }} creado exitosamente!"
+          echo "âœ… Release ${{ steps.get_version.outputs.version }} creado exitosamente!"
           echo ""
-          echo "📦 Los deployments automáticos comenzarán ahora:"
-          echo "  - Railway deployará el backend automáticamente"
-          echo "  - Vercel deployará el frontend automáticamente"
+          echo "ðŸ“¦ Los deployments automÃ¡ticos comenzarÃ¡n ahora:"
+          echo "  - Railway deployarÃ¡ el backend automÃ¡ticamente"
+          echo "  - Vercel deployarÃ¡ el frontend automÃ¡ticamente"
           echo ""
-          echo "🔗 Revisa el progreso en:"
+          echo "ðŸ”— Revisa el progreso en:"
           echo "  - Railway Dashboard: https://railway.app"
           echo "  - Vercel Dashboard: https://vercel.com"
+
