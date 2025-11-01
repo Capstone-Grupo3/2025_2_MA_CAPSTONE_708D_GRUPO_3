@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
@@ -26,10 +27,16 @@ async function bootstrap() {
 
   logger.log('✅ All required environment variables are configured');
 
-  const app = await NestFactory.create(AppModule);
+  // Create app with NestExpressApplication type for Express v5 compatibility
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
+
+  // Configure Express v5 query parser to use 'extended' mode
+  // This maintains compatibility with complex query strings (arrays, nested objects)
+  // See: https://docs.nestjs.com/migration-guide#query-parameters-parsing
+  app.set('query parser', 'extended');
 
   // Health check endpoint
-  app.getHttpAdapter().get('/health', (req, res) => {
+  app.getHttpAdapter().get('/health', (_req: any, res: any) => {
     res.status(200).json({
       status: 'ok',
       timestamp: new Date().toISOString(),
