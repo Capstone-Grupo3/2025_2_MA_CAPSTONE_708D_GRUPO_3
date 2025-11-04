@@ -79,6 +79,36 @@ export function usePostulantePortal() {
   }, [loadData]);
 
   /**
+   * Crear postulación con CV adjunto
+   */
+  const crearPostulacion = useCallback(
+    async (
+      cargoId: number,
+      respuestas: Record<string, string>,
+      cvFile?: File
+    ) => {
+      try {
+        const data = {
+          cargoId,
+          respuestasJson: respuestas,
+          cvFile,
+        };
+
+        await postulacionService.createPostulacion(data);
+        
+        // Recargar postulaciones después de crear
+        await refresh();
+        
+        return { success: true };
+      } catch (err: any) {
+        console.error("❌ Error al crear postulación:", err);
+        throw err;
+      }
+    },
+    [refresh]
+  );
+
+  /**
    * Cerrar sesión
    */
   const logout = useCallback(() => {
@@ -98,6 +128,7 @@ export function usePostulantePortal() {
     loading,
     error,
     refresh,
+    crearPostulacion,
     logout,
   };
 }

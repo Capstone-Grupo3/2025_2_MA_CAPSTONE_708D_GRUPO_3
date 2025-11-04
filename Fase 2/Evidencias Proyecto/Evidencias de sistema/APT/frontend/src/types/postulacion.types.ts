@@ -56,8 +56,8 @@ export interface CreatePostulacionDTO {
 
 export interface PostulacionFormData {
   cargoId: number;
-  postulanteId: number;
+  postulanteId?: number;
   cvFile?: File;
   cvUrl?: string;
-  respuestasJson?: RespuestaPostulacion[];
+  respuestasJson?: Record<string, string>;
 }

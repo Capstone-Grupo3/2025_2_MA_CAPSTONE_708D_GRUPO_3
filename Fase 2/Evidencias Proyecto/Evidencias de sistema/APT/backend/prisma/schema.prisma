@@ -74,6 +74,7 @@ model Postulacion {
   idPostulante       Int
   idCargo            Int
   respuestasJson     Json?
+  cvUrl              String?           @db.VarChar(500)
   puntajeIa          Decimal?          @db.Decimal(5, 2)
   feedbackIa         String?
   estado             EstadoPostulacion @default(PENDIENTE)

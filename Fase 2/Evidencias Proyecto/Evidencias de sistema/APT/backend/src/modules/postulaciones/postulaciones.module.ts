@@ -3,10 +3,12 @@ import { HttpModule } from '@nestjs/axios';
 import { PostulacionesService } from './postulaciones.service';
 import { PostulacionesController } from './postulaciones.controller';
 import { IaModule } from '../ia/ia.module';
+import { StorageModule } from '../storage/storage.module';
 
 @Module({
   imports: [
     IaModule,
+    StorageModule,
     HttpModule, // Agregar HttpModule para hacer requests a n8n
   ],
   controllers: [PostulacionesController],

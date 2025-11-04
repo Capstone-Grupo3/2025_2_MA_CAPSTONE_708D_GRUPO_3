@@ -9,6 +9,7 @@ import { PrismaService } from '../../common/prisma/prisma.service';
 import { CreatePostulacionDto } from './dto/create-postulacion.dto';
 import { firstValueFrom } from 'rxjs';
 import { IaService } from '../ia/ia.service';
+import { StorageService } from '../storage/storage.service';
 
 @Injectable()
 export class PostulacionesService {
@@ -19,6 +20,7 @@ export class PostulacionesService {
     private iaService: IaService,
     private httpService: HttpService,
     private configService: ConfigService,
+    private storageService: StorageService,
   ) {
     // Obtener URL de n8n desde variables de entorno
     this.n8nWebhookUrl =
@@ -29,13 +31,14 @@ export class PostulacionesService {
   async create(
     createPostulacionDto: CreatePostulacionDto,
     candidatoId: number,
+    cvFile?: Express.Multer.File,
   ) {
     // Verificar si ya existe postulación
     const existente = await this.prisma.postulacion.findUnique({
       where: {
         idPostulante_idCargo: {
           idPostulante: candidatoId,
-          idCargo: createPostulacionDto.idVacante,
+          idCargo: createPostulacionDto.idCargo,
         },
       },
     });
@@ -44,12 +47,46 @@ export class PostulacionesService {
       throw new ConflictException('Ya has postulado a este cargo');
     }
 
+    // Subir CV si se proporciona
+    let cvUrl: string | null = null;
+    console.log(`🔍 Verificando CV adjunto...`);
+    console.log(`📎 cvFile recibido:`, cvFile ? `Sí (${cvFile.originalname}, ${cvFile.size} bytes)` : 'No');
+    
+    if (cvFile) {
+      try {
+        cvUrl = await this.storageService.uploadCV(cvFile, candidatoId);
+        console.log(`✅ CV subido exitosamente a Supabase: ${cvUrl}`);
+      } catch (error) {
+        console.error('❌ Error al subir CV:', error.message);
+        // Continuar sin CV si falla la subida
+      }
+    }
+
+    // Si no hay CV adjunto, usar el del perfil del postulante
+    if (!cvUrl && createPostulacionDto.cvUrl) {
+      console.log(`📋 Usando cvUrl del DTO: ${createPostulacionDto.cvUrl}`);
+      cvUrl = createPostulacionDto.cvUrl;
+    }
+
+    // Si aún no hay CV, intentar obtener del perfil
+    if (!cvUrl) {
+      const postulante = await this.prisma.postulante.findUnique({
+        where: { id: candidatoId },
+        select: { cvUrl: true },
+      });
+      cvUrl = postulante?.cvUrl || null;
+      console.log(`👤 CV del perfil del postulante: ${cvUrl || 'No tiene'}`);
+    }
+
+    console.log(`📦 cvUrl final que se guardará en BD: ${cvUrl || 'null'}`);
+
     // Crear postulación
     const postulacion = await this.prisma.postulacion.create({
       data: {
         idPostulante: candidatoId,
-        idCargo: createPostulacionDto.idVacante,
+        idCargo: createPostulacionDto.idCargo,
         respuestasJson: createPostulacionDto.respuestasJson,
+        cvUrl: cvUrl, // Guardar URL del CV en la postulación
       },
       include: {
         postulante: {
@@ -72,6 +109,14 @@ export class PostulacionesService {
           },
         },
       },
+    });
+
+    console.log(`✅ Postulación creada con ID: ${postulacion.id}`);
+    console.log(`📋 Datos guardados:`, {
+      idPostulante: postulacion.idPostulante,
+      idCargo: postulacion.idCargo,
+      cvUrl: postulacion.cvUrl,
+      tieneRespuestas: !!postulacion.respuestasJson,
     });
 
     // ========================================
@@ -283,6 +328,8 @@ export class PostulacionesService {
     if (!postulacion) {
       throw new NotFoundException('Postulación no encontrada');
     }
+
+    console.log(`🔍 findOne - Postulación ID ${id} - cvUrl: ${postulacion.cvUrl || 'null'}`);
 
     return postulacion;
   }
