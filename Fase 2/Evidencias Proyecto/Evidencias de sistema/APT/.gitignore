@@ -1,6 +1,6 @@
 # ===================================
-# Capstone 2025 - Evidencias de Sistema
-# Root .gitignore for academic project
+# APT - Advanced People Tracking
+# Monorepo .gitignore
 # ===================================
 
 # ===================================
@@ -39,6 +39,13 @@ out/
 .nuxt/
 .cache/
 
+# NestJS
+backend/dist/
+
+# Next.js
+frontend/.next/
+frontend/out/
+
 # ===================================
 # Testing
 # ===================================
@@ -47,6 +54,7 @@ coverage/
 test-results/
 playwright-report/
 *.spec.js.snap
+nightly-report.md
 
 # ===================================
 # Logs
@@ -121,8 +129,14 @@ $RECYCLE.BIN/
 # ===================================
 # Package Managers
 # ===================================
+# Yarn
 yarn.lock
+yarn-error.log
+
+# pnpm
 pnpm-lock.yaml
+
+# npm
 package-lock.json.bak
 
 # ===================================
@@ -133,9 +147,6 @@ package-lock.json.bak
 
 # Railway
 .railway/
-
-# n8n
-.n8n/
 
 # Docker
 *.pid
@@ -180,7 +191,7 @@ secrets.json
 *.old
 
 # ===================================
-# Python (academic scripts)
+# Python (if any Python scripts)
 # ===================================
 __pycache__/
 *.py[cod]
