@@ -7,12 +7,17 @@ import {
   Patch,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import {
   ApiTags,
   ApiOperation,
   ApiBearerAuth,
   ApiResponse,
+  ApiConsumes,
+  ApiBody,
 } from '@nestjs/swagger';
 import { PostulacionesService } from './postulaciones.service';
 import { CreatePostulacionDto } from './dto/create-postulacion.dto';
@@ -27,13 +32,41 @@ export class PostulacionesController {
   @Post()
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Crear una postulación' })
+  @UseInterceptors(FileInterceptor('cv'))
+  @ApiConsumes('multipart/form-data')
+  @ApiOperation({ summary: 'Crear una postulación con CV opcional' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        idCargo: { type: 'number', example: 1 },
+        respuestasJson: {
+          type: 'object',
+          example: {
+            pregunta_1: 'Tengo 5 años de experiencia',
+            pregunta_2: 'Sí, domino TypeScript',
+          },
+        },
+        cv: {
+          type: 'string',
+          format: 'binary',
+          description: 'Archivo CV (PDF, opcional)',
+        },
+      },
+      required: ['idCargo'],
+    },
+  })
   @ApiResponse({ status: 201, description: 'Postulación creada exitosamente' })
-  @ApiResponse({ status: 409, description: 'Ya has postulado a esta vacante' })
-  create(@Body() createPostulacionDto: CreatePostulacionDto, @Request() req) {
+  @ApiResponse({ status: 409, description: 'Ya has postulado a esta Cargo' })
+  create(
+    @Body() createPostulacionDto: CreatePostulacionDto,
+    @Request() req,
+    @UploadedFile() cv?: Express.Multer.File,
+  ) {
     return this.postulacionesService.create(
       createPostulacionDto,
       req.user.userId,
+      cv,
     );
   }
 

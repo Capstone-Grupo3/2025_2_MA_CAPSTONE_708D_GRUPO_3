@@ -1,14 +1,27 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { Briefcase, Eye, EyeOff, User, Building2, Mail, Lock, CheckCircle, ArrowRight } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { validateEmail, validatePassword } from "@/lib/validators";
 
-export default function LoginPage() {
+// Componente que maneja los parámetros de búsqueda
+function RegistrationSuccess({ onShow }: { onShow: (show: boolean) => void }) {
   const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams?.get("registered") === "true") {
+      onShow(true);
+      setTimeout(() => onShow(false), 5000);
+    }
+  }, [searchParams, onShow]);
+
+  return null;
+}
+
+function LoginPageContent() {
   const { loginEmpresa, loginPostulante, loading, error: authError } = useAuth();
 
   const [tipoUsuario, setTipoUsuario] = useState<"empresa" | "postulante">("postulante");
@@ -18,14 +31,6 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
-
-  // Mostrar mensaje de éxito si viene del registro
-  useEffect(() => {
-    if (searchParams?.get("registered") === "true") {
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 5000);
-    }
-  }, [searchParams]);
 
   // Cargar email guardado si existe
   useEffect(() => {
@@ -68,6 +73,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-white flex">
+      {/* Componente para manejar mensaje de registro exitoso */}
+      <Suspense fallback={null}>
+        <RegistrationSuccess onShow={setShowSuccessMessage} />
+      </Suspense>
+      
       {/* Left Side - Branding */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 p-12 flex-col justify-between">
         <div>
@@ -328,5 +338,21 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// Componente principal exportado con Suspense
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Cargando...</p>
+        </div>
+      </div>
+    }>
+      <LoginPageContent />
+    </Suspense>
   );
 }

@@ -24,7 +24,7 @@ import { formatDate, getEstadoColor, formatCurrency } from "@/lib/formatters";
 
 export default function PortalCandidatoPage() {
   // Usar hook personalizado para toda la lógica
-  const { postulante, cargos, postulaciones, loading, logout } =
+  const { postulante, cargos, postulaciones, loading, crearPostulacion, logout } =
     usePostulantePortal();
 
   // Estados locales de UI
@@ -35,6 +35,8 @@ export default function PortalCandidatoPage() {
   const [cargoSeleccionado, setCargoSeleccionado] = useState<Cargo | null>(null);
   const [respuestas, setRespuestas] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const [cvFile, setCvFile] = useState<File | null>(null);
+  const [cvPreview, setCvPreview] = useState<string>("");
 
   const handleLogout = () => {
     logout();
@@ -50,6 +52,28 @@ export default function PortalCandidatoPage() {
     setShowModal(false);
     setCargoSeleccionado(null);
     setRespuestas({});
+    setCvFile(null);
+    setCvPreview("");
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validar tipo de archivo
+      if (file.type !== "application/pdf") {
+        alert("Solo se permiten archivos PDF");
+        return;
+      }
+
+      // Validar tamaño (máximo 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert("El archivo no debe superar 5MB");
+        return;
+      }
+
+      setCvFile(file);
+      setCvPreview(file.name);
+    }
   };
 
   const handleEnviarPostulacion = async () => {
@@ -69,35 +93,16 @@ export default function PortalCandidatoPage() {
 
     setSubmitting(true);
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/postulaciones`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            idVacante: cargoSeleccionado.id,
-            respuestasJson: respuestas,
-          }),
-        }
-      );
+      // Usar el hook que maneja el servicio correctamente
+      await crearPostulacion(cargoSeleccionado.id, respuestas, cvFile || undefined);
 
-      if (response.ok) {
-        alert(
-          "¡Postulación enviada exitosamente! El análisis con IA se está procesando."
-        );
-        handleCerrarModal();
-        window.location.reload(); // Recargar página para actualizar datos
-      } else {
-        const errorData = await response.json().catch(() => ({}));
-        alert(errorData.message || "Error al enviar la postulación");
-      }
-    } catch (error) {
+      alert(
+        "¡Postulación enviada exitosamente! El análisis con IA se está procesando."
+      );
+      handleCerrarModal();
+    } catch (error: any) {
       console.error("Error:", error);
-      alert("Error al enviar la postulación");
+      alert(error.message || "Error al enviar la postulación");
     } finally {
       setSubmitting(false);
     }
@@ -453,9 +458,9 @@ export default function PortalCandidatoPage() {
 
       {/* Modal de Postulación */}
       {showModal && cargoSeleccionado && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+          <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full my-8">
+            <div className="bg-white border-b px-6 py-4 flex justify-between items-center rounded-t-xl">
               <h3 className="text-2xl font-bold text-gray-800">
                 Postular a {cargoSeleccionado.titulo}
               </h3>
@@ -468,7 +473,7 @@ export default function PortalCandidatoPage() {
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-6 max-h-[60vh] overflow-y-auto">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h4 className="font-semibold text-blue-900 mb-2">
                   {cargoSeleccionado.empresa.nombre}
@@ -523,9 +528,79 @@ export default function PortalCandidatoPage() {
                   </p>
                 </div>
               )}
+
+              {/* Campo para adjuntar CV */}
+              <div className="space-y-3 pt-6 mt-6 border-t-2 border-gray-300">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-base font-semibold text-gray-800 flex items-center gap-2">
+                    <FileText className="w-5 h-5 text-orange-600" />
+                    Adjuntar CV (Opcional)
+                  </label>
+                  <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                    PDF - Max 5MB
+                  </span>
+                </div>
+                
+                <div className="relative bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-dashed border-orange-300 rounded-lg p-4 hover:border-orange-500 transition-all">
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    disabled={submitting}
+                    className="block w-full text-sm text-gray-700
+                      file:mr-4 file:py-2.5 file:px-6
+                      file:rounded-lg file:border-0
+                      file:text-sm file:font-bold
+                      file:bg-gradient-to-r file:from-orange-500 file:to-orange-600
+                      file:text-white
+                      hover:file:from-orange-600 hover:file:to-orange-700
+                      file:shadow-md
+                      cursor-pointer
+                      focus:outline-none"
+                  />
+                  <p className="text-xs text-gray-600 mt-2 text-center">
+                    📎 Haz clic en "Seleccionar archivo" o arrastra tu CV aquí
+                  </p>
+                </div>
+
+                {cvPreview && (
+                  <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-green-100 p-2 rounded-lg">
+                        <FileText className="w-5 h-5 text-green-600" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-green-900">
+                          {cvPreview}
+                        </p>
+                        <p className="text-xs text-green-700">
+                          Archivo listo para enviar
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCvFile(null);
+                        setCvPreview("");
+                      }}
+                      disabled={submitting}
+                      className="text-red-500 hover:text-red-700 font-medium text-sm"
+                    >
+                      Remover
+                    </button>
+                  </div>
+                )}
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                  <p className="text-xs text-blue-700">
+                    💡 <strong>Tip:</strong> Adjuntar tu CV permite que la IA realice un análisis más completo y preciso de tu postulación.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="sticky bottom-0 bg-white border-t px-6 py-4 flex gap-3 justify-end">
+            <div className="bg-white border-t px-6 py-4 flex gap-3 justify-end rounded-b-xl">
               <button
                 onClick={handleCerrarModal}
                 className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-all"

@@ -54,9 +54,9 @@ class PostulacionService {
   ): Promise<PostulacionDetalle> {
     const formData = new FormData();
 
-    // El backend aún usa cargoId en el endpoint
-    formData.append("cargoId", data.cargoId.toString());
-    formData.append("postulanteId", data.postulanteId.toString());
+    // El backend espera idCargo
+    // El postulanteId se obtiene del token JWT en el backend
+    formData.append("idCargo", data.cargoId.toString());
 
     if (data.cvFile) {
       formData.append("cv", data.cvFile);
